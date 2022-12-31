@@ -39,6 +39,7 @@ allow = [
   "ISC",
   "MIT",
   "MIT-0",
+  "Unicode-DFS-2016",
   "Zlib",
 ]
 
@@ -77,7 +78,10 @@ deny = [
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
 # They just couldn't be resolved ourselves.
-skip = []
+skip = [
+  { name = "concurrent-queue", version = "1.2.4" },   # async-channel v1.7.1
+  { name = "concurrent-queue", version = "2.0.0" },   # async-executor v1.5.0
+]
 
 [sources]
 # We do not allow registries other than the official crates one which is known

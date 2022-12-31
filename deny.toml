@@ -1,0 +1,94 @@
+# This file configures `cargo deny` for validating that dependencies are secure
+# (do not have security advisories), exclusively using licenses that we allow,
+# and are not in our banned crates list.
+#
+# It is worth calling out that `cargo deny` only looks at metadata of packages,
+# `cargo audit` performs the same security advisory checks but performs deep
+# scans on the content of the code as well to provide additional detections on
+# whether a vulnerability is present. The two tools should be used together.
+
+# Collect metadata using all the features available in this repository. We do
+# not want security vulnerabilities in any of our subset of builds.
+all-features = true
+
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+yanked = "deny"
+notice = "deny"
+
+# If we accept an advisory either because no fix is available and we need to
+# continue development, or because a vulnerability doesn't effect how we use
+# the other crate their identifier should be added to this list. It should be
+# periodically reviewed and cleaned out as fixes become available.
+ignore = []
+
+[licenses]
+unlicensed = "deny"
+
+# Licenses we always allow without any additional thoughts, this list should
+# only be updated when we encounter a dependency using a license we want to
+# include here rather than trying to proactively enumerate all acceptable
+# licenses.
+allow = [
+  "Apache-2.0",
+  "0BSD",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "CC0-1.0",
+  "ISC",
+  "MIT",
+  "MIT-0",
+  "Zlib",
+]
+
+# We don't care what these organization think of the license, we are making our
+# own assessments as to whether they are fit for our project.
+allow-osi-fsf-free = "neither"
+
+# Licenses that we have reviewed and chosen to explicitly reject.
+deny = []
+
+# If a license is considered copyleft, we want to consider them carefully as
+# they may violate our license or goals by their use. Copy left licenses should
+# be reviewed and selectively added by the lead maintainer only.
+copyleft = "deny"
+
+# If we haven't approved it, explicitly deny it
+default = "deny"
+
+# If we need to use a crate that violates our general policy, we can add that
+# to the list here to accept it.
+exceptions = []
+
+[bans]
+multiple-versions = "deny"
+wildcards = "deny"
+
+# Crates/versions that are always allowed regardless of which checks they trigger
+allow = [
+  #{ name = "ansi_term", version = "=0.11.0" },
+]
+
+# Crates and versions that are explicitly denied from use in this project
+deny = [
+  #{ name = "ansi_term", version = "=0.11.0" },
+]
+
+# Certain crates/versions that will be skipped when doing duplicate detection.
+# They just couldn't be resolved ourselves.
+skip = []
+
+[sources]
+# We do not allow registries other than the official crates one which is known
+# by default.
+unknown-registry = "deny"
+
+# Using a git repository as a crate source is denied by default, to use a git
+# repo as a dependency source they must be reviewed and approved for use by the
+# lead project maintainer (who will approve the modifications to this file as
+# required by the CODEOWNERS file).
+unknown-git = "deny"
+
+# Crates that have been approved by the lead maintainer to use a git source
+allow-git = []

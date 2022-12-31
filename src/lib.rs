@@ -7,9 +7,9 @@ use bevy::app::{App, AppExit, Plugin};
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
 
-use crossterm::QueueableCommand;
 use crossterm::event::Event;
 use crossterm::event::{poll as poll_term, read as read_term};
+use crossterm::QueueableCommand;
 
 //mod event_converters;
 
@@ -54,8 +54,7 @@ pub struct TuiPlugin;
 
 impl Plugin for TuiPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .insert_resource(TuiPersistentState::default())
+        app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
             .add_startup_system(terminal_setup);
     }
@@ -67,10 +66,10 @@ fn event_handler(app: &mut App, event: Event) {
             println!("receved key event {key:#?}");
             app.world.send_event(AppExit);
             //app.world.send_event(event_converters::crossterm_keycode(key));
-        },
+        }
         _ => {
             println!("received unknown event: {event:#?}");
-        },
+        }
     }
 }
 
@@ -106,7 +105,10 @@ fn terminal_setup(mut commands: Commands) {
     commands.insert_resource(term);
 }
 
-fn tick(app: &mut App, app_exit_event_reader: &mut ManualEventReader<AppExit>) -> Result<Option<Duration>, Box<dyn std::error::Error>> {
+fn tick(
+    app: &mut App,
+    app_exit_event_reader: &mut ManualEventReader<AppExit>,
+) -> Result<Option<Duration>, Box<dyn std::error::Error>> {
     let start_time = Instant::now();
 
     // The app needs to tick once to allow the startup system to setup the terminal. We delay any
@@ -123,7 +125,9 @@ fn tick(app: &mut App, app_exit_event_reader: &mut ManualEventReader<AppExit>) -
             }
         }
 
-        app.world.resource_mut::<TuiPersistentState>().timeout_reached = !events_available;
+        app.world
+            .resource_mut::<TuiPersistentState>()
+            .timeout_reached = !events_available;
     }
 
     if let Some(app_exit_events) = app.world.get_resource::<Events<AppExit>>() {
@@ -133,7 +137,9 @@ fn tick(app: &mut App, app_exit_event_reader: &mut ManualEventReader<AppExit>) -
     }
 
     app.update();
-    app.world.resource_mut::<TuiPersistentState>().mark_completed_tick();
+    app.world
+        .resource_mut::<TuiPersistentState>()
+        .mark_completed_tick();
 
     Ok(Some(Instant::now() - start_time))
 }

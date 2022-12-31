@@ -1,7 +1,7 @@
 //! Basic TUI rendering example for Bevy
 
-use bevy::prelude::*;
 use bevy::core::CorePlugin;
+use bevy::prelude::*;
 use bevy::time::TimePlugin;
 use bevy_tui::TuiPlugin;
 
@@ -21,7 +21,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>) {
-    terminal.0.draw(|f| render_ui(f)).expect("failed to draw to terminal");
+    terminal
+        .0
+        .draw(|f| render_ui(f))
+        .expect("failed to draw to terminal");
 }
 
 fn render_ui<B: tui::backend::Backend>(f: &mut tui::Frame<B>) {

@@ -1,0 +1,15 @@
+[package]
+name = "examples"
+version = "0.0.0"
+edition = "2021"
+publish = false
+license = "MIT"
+
+[dependencies]
+bevy = { default-features = false, version = "^0.9" }
+bevy_tui = { path = "../" }
+tui = "^0.19"
+
+[[example]]
+name = "basic_ui"
+path = "basic_ui.rs"

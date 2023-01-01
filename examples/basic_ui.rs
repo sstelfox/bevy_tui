@@ -1,16 +1,15 @@
 //! Basic TUI rendering example for Bevy
 
-use bevy::core::CorePlugin;
 use bevy::prelude::*;
-use bevy::time::TimePlugin;
-use bevy_tui::TuiPlugin;
+
+use bevy::app::AppExit;
+use bevy_tui::MinimalTuiPlugins;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     App::new()
-        .add_plugin(CorePlugin::default())
-        .add_plugin(TimePlugin::default())
-        .add_plugin(TuiPlugin::default())
+        .add_plugins(MinimalTuiPlugins)
         .add_system(run_basic_ui)
+        .add_system(quit_on_esc)
         .run();
 
     // The TuiPlugin handles the initialization of the terminal itself, as there aren't "shutdown"
@@ -18,6 +17,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     bevy_tui::teardown_terminal()?;
 
     Ok(())
+}
+
+fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
+    if key_code.just_pressed(KeyCode::Escape) {
+        event_writer.send(AppExit);
+    }
 }
 
 fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>) {

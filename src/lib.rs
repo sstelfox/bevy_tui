@@ -3,9 +3,12 @@
 use std::io::Write;
 use std::time::{Duration, Instant};
 
-use bevy::app::{App, AppExit, Plugin};
+use bevy::app::{App, AppExit, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::core::CorePlugin;
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
+use bevy::input::InputPlugin;
+use bevy::time::TimePlugin;
 
 use crossterm::event::Event;
 use crossterm::event::{poll as poll_term, read as read_term};
@@ -46,6 +49,18 @@ impl Default for TuiPersistentState {
             last_update: Instant::now(),
             timeout_reached: false,
         }
+    }
+}
+
+pub struct MinimalTuiPlugins;
+
+impl PluginGroup for MinimalTuiPlugins {
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(CorePlugin::default())
+            .add(InputPlugin::default())
+            .add(TimePlugin::default())
+            .add(TuiPlugin::default())
     }
 }
 

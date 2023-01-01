@@ -1,28 +1,3 @@
-//! A plugin for making interactive Bevy applications with a TUI.
-//!
-//! While there is no reason TUI couldn't be used with a Javscript terminal emulator this project
-//! doesn't yet support targetting WASM. There are some complications with the underlying terminal
-//! libraries assumptions but is probably doable if there is sufficient interest.
-
-use std::io::Write;
-use std::time::{Duration, Instant};
-
-use bevy::app::{App, AppExit, Plugin, PluginGroup, PluginGroupBuilder};
-use bevy::core::CorePlugin;
-use bevy::ecs::system::Resource;
-use bevy::ecs::event::{Events as BevyEvents, ManualEventReader};
-use bevy::time::TimePlugin;
-
-use crossterm::QueueableCommand;
-use crossterm::event::{poll as poll_term_event, read as read_term_event, Event as TerminalEvent, KeyCode as TerminalKeyCode};
-
-/// By default the loop will run at roughly 4 FPS
-const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(250);
-
-/// A wrapper around a TUI backend that can be exposed as a resource to Bevy
-#[derive(Debug, Resource)]
-pub struct BevyTerminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
-
 /// Determines the method used by TUI to run an [`App`]'s [`Schedule`](bevy::ecs::schedule::Schedule).
 ///
 /// TODO: I might want to refactor the event blocking into a separate setting...
@@ -56,14 +31,6 @@ pub enum RunMode {
     //    /// of wait. A value of [`None`] will not wait.
     //    wait: Option<Duration>,
     //},
-}
-
-impl Default for RunMode {
-    fn default() -> Self {
-        RunMode::Loop {
-            wait: DEFAULT_LOOP_DELAY,
-        }
-    }
 }
 
 /// The configuration information for the [`TuiScheduleRunnerPlugin`].
@@ -239,19 +206,6 @@ impl Plugin for TuiScheduleRunnerPlugin {
     }
 }
 
-//fn has_exit_event(app: &mut App) -> bool {
-//    let mut app_exit_event_reader = ManualEventReader::<AppExit>::default();
-//
-//    if let Some(app_exit_events) = app.world.get_resource_mut::<BevyEvents<AppExit>>() {
-//        if app_exit_event_reader.iter(&app_exit_events).last().is_some() {
-//            println!("found exit event");
-//            return true;
-//        }
-//    }
-//
-//    false
-//}
-
 fn process_event(app: &mut App, event: TerminalEvent) {
     match event {
         TerminalEvent::Key(key) => {
@@ -286,31 +240,3 @@ fn process_event(app: &mut App, event: TerminalEvent) {
         }
     }
 }
-
-fn process_all_events(app: &mut App) {
-    while let Ok(_) = poll_term_event(Duration::from_millis(0)) {
-        match read_term_event() {
-            Ok(event) => { process_event(app, event); }
-            Err(_) => ()
-        }
-    }
-}
-
-//fn tick(app: &mut App) -> (bool, Option<Duration>) {
-//    let start_time = Instant::now();
-//
-//    if has_exit_event(app) {
-//        return (false, None);
-//    }
-//
-//    app.update();
-//
-//    if has_exit_event(app) {
-//        return (false, None);
-//    }
-//
-//    let end_time = Instant::now();
-//    let execution_time = end_time - start_time;
-//
-//    (true, Some(execution_time))
-//}

@@ -14,7 +14,7 @@ use crossterm::event::Event;
 use crossterm::event::{poll as poll_term, read as read_term};
 use crossterm::QueueableCommand;
 
-//mod event_converters;
+mod adapted_input;
 
 /// By default the loop will target 4 FPS
 const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(250);
@@ -78,9 +78,7 @@ impl Plugin for TuiPlugin {
 fn event_handler(app: &mut App, event: Event) {
     match event {
         Event::Key(key) => {
-            println!("receved key event {key:#?}");
-            app.world.send_event(AppExit);
-            //app.world.send_event(event_converters::crossterm_keycode(key));
+            //app.world.send_event();
         }
         _ => {
             println!("received unknown event: {event:#?}");
@@ -93,6 +91,7 @@ pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>>
 
     let mut stdout = std::io::stdout();
     stdout.queue(crossterm::terminal::EnterAlternateScreen)?;
+    stdout.queue(crossterm::event::EnableBracketedPaste)?;
     stdout.queue(crossterm::event::EnableFocusChange)?;
     stdout.queue(crossterm::event::EnableMouseCapture)?;
     stdout.flush().expect("terminal command trigger");
@@ -108,6 +107,7 @@ pub fn teardown_terminal() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut stdout = std::io::stdout();
     stdout.queue(crossterm::terminal::LeaveAlternateScreen)?;
+    stdout.queue(crossterm::event::DisableBracketedPaste)?;
     stdout.queue(crossterm::event::DisableMouseCapture)?;
     stdout.queue(crossterm::cursor::Show)?;
     stdout.flush()?;

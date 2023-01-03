@@ -1,5 +1,7 @@
-use bevy::input::ButtonState;
+use bevy::ecs::event::EventReader;
+use bevy::ecs::system::ResMut;
 use bevy::input::keyboard::KeyCode;
+use bevy::input::{ButtonState, Input};
 use bevy::reflect::{FromReflect, Reflect};
 
 // todo: need to add a serialize feature and use it to add the additional serde and bevy reflect
@@ -9,7 +11,7 @@ use bevy::reflect::{FromReflect, Reflect};
 /// as the code have already been adapted through a keyboard layout long before we receive the
 /// event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect, FromReflect)]
-struct AdaptedKeyboardInput {
+pub(crate) struct AdaptedKeyboardInput {
     /// The key code of button pressed.
     key_code: KeyCode,
 
@@ -18,18 +20,26 @@ struct AdaptedKeyboardInput {
     state: ButtonState,
 }
 
-fn convert_adapted_keyboard_input(keyboard_input: crossterm::event::KeyEvent) -> Vec<AdaptedKeyboardInput> {
+pub(crate) fn convert_adapted_keyboard_input(
+    keyboard_input: crossterm::event::KeyEvent,
+) -> Vec<AdaptedKeyboardInput> {
     let mut events = vec![];
 
     let button_state = match convert_input_kind(keyboard_input.kind) {
         Some(state) => state,
-        None => { return events; },
+        None => {
+            return events;
+        }
     };
 
     events.push(AdaptedKeyboardInput {
         key_code: convert_key_code(keyboard_input.code),
         state: button_state,
     });
+
+    // todo: modifiers need to be separate key inputs
+
+    println!("{events:?}");
 
     events
 }
@@ -46,5 +56,58 @@ fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> Option<ButtonStat
 }
 
 fn convert_key_code(key_code: crossterm::event::KeyCode) -> KeyCode {
-    unimplemented!()
+    use crossterm::event::KeyCode::*;
+
+    match key_code {
+        // what a dumb enum variant name... There is a button dedicated to 'back' as a media key...
+        // Why not use the actual name?
+        Backspace => KeyCode::Back,
+        Char(ch) => {
+            match ch {
+                // todo: all the typeable keyboard characters...
+                _ => {
+                    unimplemented!()
+                }
+            }
+        }
+        Esc => KeyCode::Escape,
+        F(num) => {
+            match num {
+                1 => KeyCode::F1,
+                2 => KeyCode::F2,
+                3 => KeyCode::F3,
+                4 => KeyCode::F4,
+                5 => KeyCode::F5,
+                6 => KeyCode::F6,
+                7 => KeyCode::F7,
+                8 => KeyCode::F8,
+                9 => KeyCode::F9,
+                10 => KeyCode::F10,
+                11 => KeyCode::F11,
+                12 => KeyCode::F12,
+                _ => {
+                    // do these others actually exist?
+                    unimplemented!()
+                }
+            }
+        }
+        // todo: all the remaining key codes
+        _ => {
+            unimplemented!()
+        }
+    }
+}
+
+pub(crate) fn keyboard_input_system(
+    mut key_input: ResMut<Input<KeyCode>>,
+    mut keyboard_input_events: EventReader<AdaptedKeyboardInput>,
+) {
+    key_input.clear();
+
+    for event in keyboard_input_events.iter() {
+        match event.state {
+            ButtonState::Pressed => key_input.press(event.key_code),
+            ButtonState::Released => key_input.release(event.key_code),
+        }
+    }
 }

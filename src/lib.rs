@@ -3,11 +3,13 @@
 use std::io::Write;
 use std::time::{Duration, Instant};
 
-use bevy::app::{App, AppExit, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::app::{App, AppExit, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
 use bevy::core::CorePlugin;
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
-use bevy::input::InputPlugin;
+use bevy::input::keyboard::KeyCode;
+use bevy::input::{Input, InputPlugin, InputSystem};
+use bevy::prelude::IntoSystemDescriptor;
 use bevy::time::TimePlugin;
 
 use crossterm::event::Event;
@@ -71,14 +73,22 @@ impl Plugin for TuiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
-            .add_startup_system(terminal_setup);
+            .add_startup_system(terminal_setup)
+            .add_event::<adapted_input::AdaptedKeyboardInput>()
+            .init_resource::<Input<KeyCode>>()
+            .add_system_to_stage(
+                CoreStage::PreUpdate,
+                adapted_input::keyboard_input_system.label(InputSystem),
+            );
     }
 }
 
 fn event_handler(app: &mut App, event: Event) {
     match event {
         Event::Key(key) => {
-            //app.world.send_event();
+            adapted_input::convert_adapted_keyboard_input(key)
+                .into_iter()
+                .for_each(|ki| app.world.send_event(ki));
         }
         _ => {
             println!("received unknown event: {event:#?}");

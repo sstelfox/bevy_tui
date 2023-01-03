@@ -21,7 +21,7 @@ use crate::adapted_input::AdaptedKeyboardInput;
 mod adapted_input;
 
 /// By default the loop will target 4 FPS
-const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(25000);
+const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(2500);
 
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
@@ -82,8 +82,13 @@ impl Plugin for TuiPlugin {
                 CoreStage::PreUpdate,
                 adapted_input::keyboard_input_system.label(InputSystem),
             )
-            .register_type::<ButtonState>()
-            .register_type::<AdaptedKeyboardInput>()
+            .add_system_to_stage(CoreStage::PostUpdate, adapted_input::keyboard_reset_system);
+
+        // Register the common type
+        app.register_type::<ButtonState>();
+
+        // Register keyboard types
+        app.register_type::<AdaptedKeyboardInput>()
             .register_type::<KeyCode>();
     }
 }
@@ -93,10 +98,13 @@ fn event_handler(app: &mut App, event: Event) {
         Event::Key(key) => {
             adapted_input::convert_adapted_keyboard_input(key)
                 .into_iter()
-                .for_each(|ki| { println!("sending event {ki:?}"); app.world.send_event(ki); });
+                .for_each(|ki| {
+                    println!("sending event {ki:?}\r");
+                    app.world.send_event(ki);
+                });
         }
         _ => {
-            println!("received unknown event: {event:#?}");
+            println!("received unknown event: {event:?}\r");
         }
     }
 }
@@ -105,10 +113,15 @@ pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>>
     crossterm::terminal::enable_raw_mode()?;
 
     let mut stdout = std::io::stdout();
-    //stdout.queue(crossterm::terminal::EnterAlternateScreen)?;
-    stdout.queue(crossterm::event::EnableBracketedPaste)?;
+    stdout.queue(crossterm::terminal::EnterAlternateScreen)?;
+    //stdout.queue(crossterm::event::EnableBracketedPaste)?;
     //stdout.queue(crossterm::event::EnableFocusChange)?;
     //stdout.queue(crossterm::event::EnableMouseCapture)?;
+    //stdout.queue(crossterm::event::PushKeyboardEnhancementFlags(
+    //    crossterm::event::KeyboardEnhancementFlags::DISAMBIGUATE_ESCAPE_CODES
+    //        | crossterm::event::KeyboardEnhancementFlags::REPORT_EVENT_TYPES
+    //        | crossterm::event::KeyboardEnhancementFlags::REPORT_ALL_KEYS_AS_ESCAPE_CODES,
+    //))?;
     stdout.flush().expect("terminal command trigger");
 
     let backend = tui::backend::CrosstermBackend::new(stdout);
@@ -122,9 +135,10 @@ pub fn teardown_terminal() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut stdout = std::io::stdout();
     //stdout.queue(crossterm::terminal::LeaveAlternateScreen)?;
-    stdout.queue(crossterm::event::DisableBracketedPaste)?;
+    //stdout.queue(crossterm::event::DisableBracketedPaste)?;
     //stdout.queue(crossterm::event::DisableFocusChange)?;
     //stdout.queue(crossterm::event::DisableMouseCapture)?;
+    //stdout.queue(crossterm::event::PopKeyboardEnhancementFlags)?;
     stdout.queue(crossterm::cursor::Show)?;
     stdout.flush()?;
 
@@ -140,7 +154,7 @@ fn tick(
     app: &mut App,
     app_exit_event_reader: &mut ManualEventReader<AppExit>,
 ) -> Result<Option<Duration>, Box<dyn std::error::Error>> {
-    println!("starting tick");
+    println!("starting tick\r");
     let start_time = Instant::now();
 
     // The app needs to tick once to allow the startup system to setup the terminal. We delay any
@@ -148,44 +162,45 @@ fn tick(
     // an event is received.
     let first_run = app.world.resource::<TuiPersistentState>().is_first_run();
     if !first_run {
-        println!("checking for events");
+        println!("checking for events\r");
         // todo: need to adjust this delay based on how long the last loop took
         let events_available = poll_term(DEFAULT_LOOP_DELAY)?;
 
         if events_available {
-            println!("found events");
+            println!("found events\r");
 
             // Read all of the available events all at once
             while poll_term(Duration::from_secs(0))? {
-                println!("processing event");
+                println!("processing event\r");
                 event_handler(app, read_term()?);
             }
 
-            println!("finished processing events");
+            println!("finished processing events\r");
         } else {
-            println!("no events available");
+            println!("no events available\r");
         }
 
-        println!("updating tui state");
+        println!("updating tui state\r");
         app.world
             .resource_mut::<TuiPersistentState>()
             .timeout_reached = !events_available;
     }
 
-    println!("triggering app updates");
+    println!("triggering app updates\r");
     app.update();
     app.world
         .resource_mut::<TuiPersistentState>()
         .mark_completed_tick();
 
-    println!("checking for generated exit events");
+    println!("checking for generated exit events\r");
     if let Some(app_exit_events) = app.world.get_resource::<Events<AppExit>>() {
         if app_exit_event_reader.iter(app_exit_events).last().is_some() {
+            println!("found exit event, exiting tick loop\r");
             return Ok(None);
         }
     }
 
-    println!("tick complete");
+    println!("tick complete\r\n\r");
     Ok(Some(Instant::now() - start_time))
 }
 

@@ -64,6 +64,16 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> KeyCode {
         Backspace => KeyCode::Back,
         Char(ch) => {
             match ch {
+                '1' => KeyCode::Key1,
+                '2' => KeyCode::Key2,
+                '3' => KeyCode::Key3,
+                '4' => KeyCode::Key4,
+                '5' => KeyCode::Key5,
+                '6' => KeyCode::Key6,
+                '7' => KeyCode::Key7,
+                '8' => KeyCode::Key8,
+                '9' => KeyCode::Key9,
+                '0' => KeyCode::Key0,
                 // todo: all the typeable keyboard characters...
                 _ => {
                     unimplemented!()

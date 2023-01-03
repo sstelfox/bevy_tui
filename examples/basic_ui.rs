@@ -8,7 +8,7 @@ use bevy_tui::MinimalTuiPlugins;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     App::new()
         .add_plugins(MinimalTuiPlugins)
-        .add_system(run_basic_ui)
+        //.add_system(run_basic_ui)
         .add_system(quit_on_esc)
         .run();
 
@@ -21,6 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
     if key_code.just_pressed(KeyCode::Escape) {
+        println!("sent exit event");
         event_writer.send(AppExit);
     }
 }

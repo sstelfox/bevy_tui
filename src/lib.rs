@@ -8,7 +8,7 @@ use bevy::core::CorePlugin;
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
-use bevy::input::{Input, InputPlugin, InputSystem};
+use bevy::input::{ButtonState, Input, InputPlugin, InputSystem};
 use bevy::prelude::IntoSystemDescriptor;
 use bevy::time::TimePlugin;
 
@@ -16,10 +16,12 @@ use crossterm::event::Event;
 use crossterm::event::{poll as poll_term, read as read_term};
 use crossterm::QueueableCommand;
 
+use crate::adapted_input::AdaptedKeyboardInput;
+
 mod adapted_input;
 
 /// By default the loop will target 4 FPS
-const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(250);
+const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(25000);
 
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
@@ -79,7 +81,10 @@ impl Plugin for TuiPlugin {
             .add_system_to_stage(
                 CoreStage::PreUpdate,
                 adapted_input::keyboard_input_system.label(InputSystem),
-            );
+            )
+            .register_type::<ButtonState>()
+            .register_type::<AdaptedKeyboardInput>()
+            .register_type::<KeyCode>();
     }
 }
 
@@ -88,7 +93,7 @@ fn event_handler(app: &mut App, event: Event) {
         Event::Key(key) => {
             adapted_input::convert_adapted_keyboard_input(key)
                 .into_iter()
-                .for_each(|ki| app.world.send_event(ki));
+                .for_each(|ki| { println!("sending event {ki:?}"); app.world.send_event(ki); });
         }
         _ => {
             println!("received unknown event: {event:#?}");
@@ -100,10 +105,10 @@ pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>>
     crossterm::terminal::enable_raw_mode()?;
 
     let mut stdout = std::io::stdout();
-    stdout.queue(crossterm::terminal::EnterAlternateScreen)?;
+    //stdout.queue(crossterm::terminal::EnterAlternateScreen)?;
     stdout.queue(crossterm::event::EnableBracketedPaste)?;
-    stdout.queue(crossterm::event::EnableFocusChange)?;
-    stdout.queue(crossterm::event::EnableMouseCapture)?;
+    //stdout.queue(crossterm::event::EnableFocusChange)?;
+    //stdout.queue(crossterm::event::EnableMouseCapture)?;
     stdout.flush().expect("terminal command trigger");
 
     let backend = tui::backend::CrosstermBackend::new(stdout);
@@ -116,9 +121,10 @@ pub fn teardown_terminal() -> Result<(), Box<dyn std::error::Error>> {
     crossterm::terminal::disable_raw_mode()?;
 
     let mut stdout = std::io::stdout();
-    stdout.queue(crossterm::terminal::LeaveAlternateScreen)?;
+    //stdout.queue(crossterm::terminal::LeaveAlternateScreen)?;
     stdout.queue(crossterm::event::DisableBracketedPaste)?;
-    stdout.queue(crossterm::event::DisableMouseCapture)?;
+    //stdout.queue(crossterm::event::DisableFocusChange)?;
+    //stdout.queue(crossterm::event::DisableMouseCapture)?;
     stdout.queue(crossterm::cursor::Show)?;
     stdout.flush()?;
 
@@ -134,6 +140,7 @@ fn tick(
     app: &mut App,
     app_exit_event_reader: &mut ManualEventReader<AppExit>,
 ) -> Result<Option<Duration>, Box<dyn std::error::Error>> {
+    println!("starting tick");
     let start_time = Instant::now();
 
     // The app needs to tick once to allow the startup system to setup the terminal. We delay any
@@ -141,31 +148,44 @@ fn tick(
     // an event is received.
     let first_run = app.world.resource::<TuiPersistentState>().is_first_run();
     if !first_run {
+        println!("checking for events");
+        // todo: need to adjust this delay based on how long the last loop took
         let events_available = poll_term(DEFAULT_LOOP_DELAY)?;
 
         if events_available {
+            println!("found events");
+
             // Read all of the available events all at once
             while poll_term(Duration::from_secs(0))? {
+                println!("processing event");
                 event_handler(app, read_term()?);
             }
+
+            println!("finished processing events");
+        } else {
+            println!("no events available");
         }
 
+        println!("updating tui state");
         app.world
             .resource_mut::<TuiPersistentState>()
             .timeout_reached = !events_available;
     }
 
+    println!("triggering app updates");
+    app.update();
+    app.world
+        .resource_mut::<TuiPersistentState>()
+        .mark_completed_tick();
+
+    println!("checking for generated exit events");
     if let Some(app_exit_events) = app.world.get_resource::<Events<AppExit>>() {
         if app_exit_event_reader.iter(app_exit_events).last().is_some() {
             return Ok(None);
         }
     }
 
-    app.update();
-    app.world
-        .resource_mut::<TuiPersistentState>()
-        .mark_completed_tick();
-
+    println!("tick complete");
     Ok(Some(Instant::now() - start_time))
 }
 

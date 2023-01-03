@@ -16,7 +16,7 @@ use crossterm::event::Event;
 use crossterm::event::{poll as poll_term, read as read_term};
 use crossterm::QueueableCommand;
 
-use crate::adapted_input::AdaptedKeyboardInput;
+use crate::adapted_input::{AdaptedKeyboardInput, RawConsoleEvent};
 
 mod adapted_input;
 
@@ -77,6 +77,7 @@ impl Plugin for TuiPlugin {
             .set_runner(tui_schedule_runner)
             .add_startup_system(terminal_setup)
             .add_event::<adapted_input::AdaptedKeyboardInput>()
+            .add_event::<adapted_input::RawConsoleEvent>()
             .init_resource::<Input<KeyCode>>()
             .add_system_to_stage(
                 CoreStage::PreUpdate,
@@ -96,7 +97,7 @@ impl Plugin for TuiPlugin {
 fn event_handler(app: &mut App, event: Event) {
     match event {
         Event::Key(key) => {
-            adapted_input::convert_adapted_keyboard_input(key)
+            adapted_input::convert_adapted_keyboard_input(&key)
                 .into_iter()
                 .for_each(|ki| app.world.send_event(ki));
         }
@@ -104,6 +105,8 @@ fn event_handler(app: &mut App, event: Event) {
             println!("received unknown event: {event:?}\r");
         }
     }
+
+    app.world.send_event(RawConsoleEvent(event));
 }
 
 pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>> {

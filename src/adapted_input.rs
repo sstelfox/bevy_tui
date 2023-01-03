@@ -20,8 +20,11 @@ pub(crate) struct AdaptedKeyboardInput {
     state: ButtonState,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RawConsoleEvent(pub crossterm::event::Event);
+
 pub(crate) fn convert_adapted_keyboard_input(
-    keyboard_input: crossterm::event::KeyEvent,
+    keyboard_input: &crossterm::event::KeyEvent,
 ) -> Vec<AdaptedKeyboardInput> {
     let mut events = vec![];
 

@@ -27,10 +27,7 @@ pub(crate) fn convert_adapted_keyboard_input(
 
     let button_state = match convert_input_kind(keyboard_input.kind) {
         Some(state) => state,
-        None => {
-            println!("no valid input kind\r");
-            return events;
-        }
+        None => { return events; }
     };
 
     events.push(AdaptedKeyboardInput {
@@ -113,17 +110,11 @@ pub(crate) fn keyboard_input_system(
     mut key_input: ResMut<Input<KeyCode>>,
     mut keyboard_input_events: EventReader<AdaptedKeyboardInput>,
 ) {
-    println!("initial keyboard state: {key_input:?}\r");
-
     for event in keyboard_input_events.iter() {
-        println!("pre-event keyboard state: {event:?} -> {key_input:?}\r");
-
         match event.state {
             ButtonState::Pressed => key_input.press(event.key_code),
             ButtonState::Released => key_input.release(event.key_code),
         }
-
-        println!("post-event keyboard state: {event:?} -> {key_input:?}\r");
     }
 }
 
@@ -134,7 +125,5 @@ pub(crate) fn keyboard_input_system(
 // todo: in the future I should either detect whether the releases are supported in the terminal or
 // base it off of if I receive a release event.
 pub(crate) fn keyboard_reset_system(mut key_input: ResMut<Input<KeyCode>>) {
-    println!("reset system state: {key_input:?}\r");
     key_input.reset_all();
-    println!("post reset system state: {key_input:?}\r");
 }

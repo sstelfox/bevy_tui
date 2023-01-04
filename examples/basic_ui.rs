@@ -20,7 +20,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
-    if key_code.just_pressed(KeyCode::Escape) {
+    if key_code.just_pressed(KeyCode::Q) {
         event_writer.send(AppExit);
     }
 }
@@ -30,7 +30,7 @@ fn render_ui<B: tui::backend::Backend>(f: &mut tui::Frame<B>) {
         .constraints([tui::layout::Constraint::Percentage(100)].as_ref())
         .split(f.size());
 
-    let styled_content = tui::text::Span::styled("Hello Bevy!", tui::style::Style::default());
+    let styled_content = tui::text::Span::styled("Hello Bevy! Press 'q' to quit.", tui::style::Style::default());
     let paragraph = tui::widgets::Paragraph::new(styled_content)
         .alignment(tui::layout::Alignment::Center)
         .wrap(tui::widgets::Wrap { trim: true });

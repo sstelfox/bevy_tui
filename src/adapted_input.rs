@@ -69,6 +69,15 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
     use crossterm::event::KeyCode::*;
 
     let key_codes = match key_code {
+        Enter => vec![KeyCode::Return],
+        Left => vec![KeyCode::Left],
+        Right => vec![KeyCode::Right],
+        Up => vec![KeyCode::Up],
+        Down => vec![KeyCode::Down],
+        Home => vec![KeyCode::Home],
+        End => vec![KeyCode::End],
+        PageUp => vec![KeyCode::PageUp],
+        PageDown => vec![KeyCode::PageDown],
         Esc => vec![KeyCode::Escape],
         F(num) => {
             match num {
@@ -106,7 +115,9 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         // what a dumb enum variant name... There is a button dedicated to 'back' as a media key...
         // Why not use the actual name?
         Backspace => vec![KeyCode::Back],
-        Tab => vec![KeyCode::Tab],
+        Tab => unshifted!(KeyCode::Tab),
+        BackTab => shifted!(KeyCode::Tab),
+        Delete => vec![KeyCode::Delete],
         Char(ch) => {
             match ch {
                 '`' => unshifted!(KeyCode::Grave),

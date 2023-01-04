@@ -18,6 +18,8 @@ There are some keys which are ambiguous on the keyboard and are representable wi
 
 Due to historical limitations of terminals, not all control sequences or typable characters are allowed, though there are [terminal extensions](https://sw.kovidgoyal.net/kitty/protocol-extensions/) which allow these, they are not commonly or well supported. The events from the terminal the `crossterm` library supports are all represented and exposed to the Bevy event system if your terminal supports it but the default terminal initialization does not attempt to enable these extensions. Not all documented extensions are supported by `crossterm`, please refer to that project for specific support.
 
+If you're using 'Escape' as a key, it will work but you may notice several seconds of delay before it is actually reported. This is also due to an underlying disambiguation of control codes and the key on its own which relies on a timeout under the hood before it gets reported.
+
 ## Continous Integration
 
 Running all the CI processes locally:

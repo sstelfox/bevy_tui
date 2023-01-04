@@ -69,48 +69,6 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
     use crossterm::event::KeyCode::*;
 
     let key_codes = match key_code {
-        // what a dumb enum variant name... There is a button dedicated to 'back' as a media key...
-        // Why not use the actual name?
-        Backspace => vec![KeyCode::Back],
-        Char(ch) => {
-            match ch {
-                '`' => unshifted!(KeyCode::Grave),
-                '~' => shifted!(KeyCode::Grave),
-                '1' => unshifted!(KeyCode::Key1),
-                '!' => shifted!(KeyCode::Key1),
-                '2' => unshifted!(KeyCode::Key2),
-                '@' => shifted!(KeyCode::Key2),
-                '3' => unshifted!(KeyCode::Key3),
-                '#' => shifted!(KeyCode::Key3),
-                '4' => unshifted!(KeyCode::Key4),
-                '$' => shifted!(KeyCode::Key4),
-                '5' => unshifted!(KeyCode::Key5),
-                '%' => shifted!(KeyCode::Key5),
-                '6' => unshifted!(KeyCode::Key6),
-                '^' => shifted!(KeyCode::Key6),
-                '7' => unshifted!(KeyCode::Key7),
-                '&' => shifted!(KeyCode::Key7),
-                '8' => unshifted!(KeyCode::Key8),
-                '*' => shifted!(KeyCode::Key8),
-                '9' => unshifted!(KeyCode::Key9),
-                '(' => shifted!(KeyCode::Key9),
-                '0' => unshifted!(KeyCode::Key0),
-                ')' => shifted!(KeyCode::Key0),
-                '-' => unshifted!(KeyCode::Minus),
-                '_' => shifted!(KeyCode::Minus),
-                '=' => unshifted!(KeyCode::Equals),
-                // It's worth calling out here that there is a Bevy key code for `+` but it is
-                // intended for use with the keypad. I'm prioritizing a more commonly typed
-                // variation (this may be a personal logical fallacy but it works for me). If you
-                // hit an issue regarding this there is a specific published event with the raw
-                // character and I'm open to issues to discuss this further.
-                '+' => shifted!(KeyCode::Equals),
-                // todo: all the typeable keyboard characters...
-                _ => {
-                    unimplemented!()
-                }
-            }
-        }
         Esc => vec![KeyCode::Escape],
         F(num) => {
             match num {
@@ -129,15 +87,127 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
                 13 => vec![KeyCode::F13],
                 14 => vec![KeyCode::F14],
                 15 => vec![KeyCode::F15],
+                16 => vec![KeyCode::F16],
+                17 => vec![KeyCode::F17],
+                18 => vec![KeyCode::F18],
+                19 => vec![KeyCode::F19],
+                20 => vec![KeyCode::F20],
+                21 => vec![KeyCode::F21],
+                22 => vec![KeyCode::F22],
+                23 => vec![KeyCode::F23],
+                24 => vec![KeyCode::F24],
                 _ => {
-                    // do these others actually exist?
-                    unimplemented!()
+                    // Bevy doesn't support more than this so we're going to assume they don't
+                    // exist for now. Open an issue if this bites you.
+                    unreachable!();
                 }
             }
         }
+        // what a dumb enum variant name... There is a button dedicated to 'back' as a media key...
+        // Why not use the actual name?
+        Backspace => vec![KeyCode::Back],
+        Tab => vec![KeyCode::Tab],
+        Char(ch) => {
+            match ch {
+                '`' => unshifted!(KeyCode::Grave),
+                '~' => shifted!(KeyCode::Grave),
+                '1' => unshifted!(KeyCode::Key1),
+                '!' => shifted!(KeyCode::Key1),
+                '2' => unshifted!(KeyCode::Key2),
+                '@' => shifted!(KeyCode::Key2),
+                '3' => unshifted!(KeyCode::Key3),
+                '#' => shifted!(KeyCode::Key3),
+                '4' => unshifted!(KeyCode::Key4),
+                '$' => shifted!(KeyCode::Key4),
+                '5' => unshifted!(KeyCode::Key5),
+                '%' => shifted!(KeyCode::Key5),
+                '6' => unshifted!(KeyCode::Key6),
+                // There is a Bevy key code dedicated for this intended for the keypad character.
+                // This is instead using the shifted version as that tends to be the more commonly
+                // typed character. It may be worth adding the dedicated character keycode as well
+                // but so far it hasn't been necessary and may cause unintentional side effects.
+                // If you hit an issue regarding this please open an issue to discuss your use case
+                // or switch to the published RawConsoleEvent instead.
+                '^' => shifted!(KeyCode::Key6),
+                '7' => unshifted!(KeyCode::Key7),
+                '&' => shifted!(KeyCode::Key7),
+                '8' => unshifted!(KeyCode::Key8),
+                '*' => shifted!(KeyCode::Key8),
+                '9' => unshifted!(KeyCode::Key9),
+                '(' => shifted!(KeyCode::Key9),
+                '0' => unshifted!(KeyCode::Key0),
+                ')' => shifted!(KeyCode::Key0),
+                '-' => unshifted!(KeyCode::Minus),
+                '_' => shifted!(KeyCode::Minus),
+                '=' => unshifted!(KeyCode::Equals),
+                // There is a Bevy key code dedicated for this intended for the keypad character.
+                // This is instead using the shifted version as that tends to be the more commonly
+                // typed character. It may be worth adding the dedicated character keycode as well
+                // but so far it hasn't been necessary and may cause unintentional side effects.
+                // If you hit an issue regarding this please open an issue to discuss your use case
+                // or switch to the published RawConsoleEvent instead.
+                '+' => shifted!(KeyCode::Equals),
+                'q' => unshifted!(KeyCode::Q),
+                'Q' => shifted!(KeyCode::Q),
+                'w' => unshifted!(KeyCode::W),
+                'W' => shifted!(KeyCode::W),
+                'e' => unshifted!(KeyCode::E),
+                'E' => shifted!(KeyCode::E),
+                'r' => unshifted!(KeyCode::R),
+                'R' => shifted!(KeyCode::R),
+                't' => unshifted!(KeyCode::T),
+                'T' => shifted!(KeyCode::T),
+                'y' => unshifted!(KeyCode::Y),
+                'Y' => shifted!(KeyCode::Y),
+                'u' => unshifted!(KeyCode::U),
+                'U' => shifted!(KeyCode::U),
+                'i' => unshifted!(KeyCode::I),
+                'I' => shifted!(KeyCode::I),
+                'o' => unshifted!(KeyCode::O),
+                'O' => shifted!(KeyCode::O),
+                'p' => unshifted!(KeyCode::P),
+                'P' => shifted!(KeyCode::P),
+                '[' => unshifted!(KeyCode::LBracket),
+                '{' => shifted!(KeyCode::LBracket),
+                ']' => unshifted!(KeyCode::RBracket),
+                '}' => shifted!(KeyCode::RBracket),
+                '\\' => unshifted!(KeyCode::Backslash),
+                '|' => shifted!(KeyCode::Backslash),
+                'a' => unshifted!(KeyCode::A),
+                'A' => shifted!(KeyCode::A),
+                's' => unshifted!(KeyCode::S),
+                'S' => shifted!(KeyCode::S),
+                'd' => unshifted!(KeyCode::D),
+                'D' => shifted!(KeyCode::D),
+                'f' => unshifted!(KeyCode::F),
+                'F' => shifted!(KeyCode::F),
+                'g' => unshifted!(KeyCode::G),
+                'G' => shifted!(KeyCode::G),
+                'h' => unshifted!(KeyCode::H),
+                'H' => shifted!(KeyCode::H),
+                'j' => unshifted!(KeyCode::J),
+                'J' => shifted!(KeyCode::J),
+                'k' => unshifted!(KeyCode::K),
+                'K' => shifted!(KeyCode::K),
+                'l' => unshifted!(KeyCode::L),
+                'L' => shifted!(KeyCode::L),
+                ';' => unshifted!(KeyCode::Semicolon),
+                ':' => shifted!(KeyCode::Semicolon),
+                //'\'' => unshifted!(KeyCode::),
+                //'"' => shifted!(KeyCode::),
+                //'' => unshifted!(KeyCode::),
+                //'' => shifted!(KeyCode::),
+                // todo: all the typeable keyboard characters...
+                _ => {
+                    println!("unknown typable keyboard character: {key_code:?}");
+                    vec![]
+                }
+            }
+        },
         // todo: all the remaining key codes
         _ => {
-            unimplemented!()
+            println!("unknown event: {key_code:?}");
+            vec![]
         }
     };
 

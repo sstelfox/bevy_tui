@@ -8,7 +8,7 @@ use bevy::core::CorePlugin;
 use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
-use bevy::input::{ButtonState, Input, InputPlugin, InputSystem};
+use bevy::input::{ButtonState, Input, InputSystem};
 use bevy::prelude::IntoSystemDescriptor;
 use bevy::time::TimePlugin;
 
@@ -62,7 +62,6 @@ impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(CorePlugin::default())
-            .add(InputPlugin::default())
             .add(TimePlugin::default())
             .add(TuiPlugin::default())
     }
@@ -82,8 +81,7 @@ impl Plugin for TuiPlugin {
             .add_system_to_stage(
                 CoreStage::PreUpdate,
                 adapted_input::keyboard_input_system.label(InputSystem),
-            )
-            .add_system_to_stage(CoreStage::PostUpdate, adapted_input::keyboard_reset_system);
+            );
 
         // Register the common type
         app.register_type::<ButtonState>();

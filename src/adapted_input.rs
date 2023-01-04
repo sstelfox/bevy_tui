@@ -136,11 +136,7 @@ pub(crate) fn keyboard_input_system(
 
     for event in keyboard_input_events.iter() {
         match event.state {
-            ButtonState::Pressed => {
-                key_input.press(event.key_code);
-                assert!(key_input.pressed(event.key_code));
-                assert!(key_input.just_pressed(event.key_code));
-            }
+            ButtonState::Pressed => key_input.press(event.key_code),
             ButtonState::Released => key_input.release(event.key_code),
         }
     }

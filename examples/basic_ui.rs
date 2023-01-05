@@ -5,6 +5,13 @@ use bevy::prelude::*;
 use bevy::app::AppExit;
 use bevy_tui::MinimalTuiPlugins;
 
+use tui::backend::Backend;
+use tui::Frame;
+use tui::layout::{Alignment, Constraint, Layout};
+use tui::style::Style;
+use tui::text::Span;
+use tui::widgets::{Paragraph, Wrap};
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Perform the initial setup of the terminal such as enabling raw mode, switching to the
     // alternate mode, enabling mouse control and more.
@@ -32,22 +39,32 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: tui::backend::Backend>(f: &mut tui::Frame<B>) {
-    let chunks = tui::layout::Layout::default()
-        .constraints([tui::layout::Constraint::Percentage(100)].as_ref())
+fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
+    let chunks = Layout::default()
+        .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
         .split(f.size());
 
-    let styled_content = tui::text::Span::styled("Hello Bevy! Press 'q' to quit.", tui::style::Style::default());
-    let paragraph = tui::widgets::Paragraph::new(styled_content)
-        .alignment(tui::layout::Alignment::Center)
-        .wrap(tui::widgets::Wrap { trim: true });
+    let hello_content = Span::styled("Hello Bevy! Press 'q' to quit.", Style::default());
+    let hello_paragraph = Paragraph::new(hello_content)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
 
-    f.render_widget(paragraph, chunks[0]);
+    f.render_widget(hello_paragraph, chunks[0]);
+
+    let input_content = Span::styled(format!("{:?}", input), Style::default());
+    let input_paragraph = Paragraph::new(input_content)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(input_paragraph, chunks[1]);
 }
 
-fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>) {
+fn run_basic_ui(
+    mut terminal: ResMut<bevy_tui::BevyTerminal>,
+    current_input: Res<Input<KeyCode>>,
+) {
     terminal
         .0
-        .draw(|f| render_ui(f))
+        .draw(|f| render_ui(f, &current_input))
         .expect("failed to draw to terminal");
 }

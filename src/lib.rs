@@ -107,7 +107,14 @@ fn event_handler(app: &mut App, event: Event) {
     app.world.send_event(RawConsoleEvent(event));
 }
 
-pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>> {
+pub fn create_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>> {
+    let stdout = std::io::stdout();
+    let backend = tui::backend::CrosstermBackend::new(stdout);
+    let terminal = tui::Terminal::new(backend)?;
+    Ok(Terminal(terminal))
+}
+
+pub fn initialize_terminal() -> Result<(), Box<dyn std::error::Error>> {
     crossterm::terminal::enable_raw_mode()?;
 
     let mut stdout = std::io::stdout();
@@ -122,10 +129,7 @@ pub fn initialize_terminal() -> Result<BevyTerminal, Box<dyn std::error::Error>>
     //))?;
     stdout.flush().expect("terminal command trigger");
 
-    let backend = tui::backend::CrosstermBackend::new(stdout);
-    let terminal = tui::Terminal::new(backend)?;
-
-    Ok(Terminal(terminal))
+    Ok(())
 }
 
 pub fn teardown_terminal() -> Result<(), Box<dyn std::error::Error>> {
@@ -144,7 +148,7 @@ pub fn teardown_terminal() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn terminal_setup(mut commands: Commands) {
-    let term = initialize_terminal().expect("terminal setup to succeed");
+    let term = create_terminal().expect("terminal setup to succeed");
     commands.insert_resource(term);
 }
 

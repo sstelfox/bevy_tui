@@ -78,6 +78,7 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         End => vec![KeyCode::End],
         PageUp => vec![KeyCode::PageUp],
         PageDown => vec![KeyCode::PageDown],
+        Insert => vec![KeyCode::Insert],
         Esc => vec![KeyCode::Escape],
         F(num) => {
             match num {
@@ -120,6 +121,7 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         Delete => vec![KeyCode::Delete],
         Char(ch) => {
             match ch {
+                ' ' => unshifted!(KeyCode::Space),
                 '`' => unshifted!(KeyCode::Grave),
                 '~' => shifted!(KeyCode::Grave),
                 '1' => unshifted!(KeyCode::Key1),

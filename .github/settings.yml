@@ -1,0 +1,51 @@
+repository:
+  name: bevy_tui
+  description: >
+    A plugin for making interactive Bevy applications with a TUI instead of a
+    graphical interface.
+  homepage: https://github.com/sstelfox/bevy_tui
+
+  topics: bevy, console, rust, terminal
+
+  has_downloads: true
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+
+  default_branch: main
+  private: false
+
+  allow_merge_commit: false
+  allow_rebase_merge: false
+  allow_squash_merge: true
+
+  delete_branch_on_merge: true
+
+labels:
+  - name: bug
+    color: 0e8a16
+    description: Something isn't working as expected or is actively breaking
+
+  - name: details-needed
+    color: d876e3
+    description: Further information is requested before the issue can continue to be addressed
+
+  - name: documentation
+    color: 0075ca
+    description: Improvements or additions to documentation
+
+  - name: duplicate
+    color: b60205
+    description: This issue or pull request already exists
+
+  - name: enhancement
+    color: fbca04
+    description: New feature or request for change
+
+  - name: invalid
+    color: b60205
+    description: The issue appears to be unreproducible, is irrelevant, or ultimately unwanted.
+
+  - name: needs-refinement
+    color: d876e3
+    description: Details need to be worked out to address the feature request or issue

@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+    # Only trigger the CI process when code or configs relevant to the CI process changes
+    paths:
+      - 'Cargo.*'
+      - '*.toml'
+      - 'examples/**'
+      - 'src/**'
+      - 'tools/ci/**'
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  standard-ci-checks:
+    name: Verify benchmarks, examples, and core code all compile
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup show
+      - run: cargo install cargo-deny
+      - run: cargo run -p ci -- default

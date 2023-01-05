@@ -58,11 +58,15 @@ fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> Option<ButtonStat
 }
 
 macro_rules! shifted {
-    ($key_code:expr) => { vec![KeyCode::LShift, $key_code] }
+    ($key_code:expr) => {
+        vec![KeyCode::LShift, $key_code]
+    };
 }
 
 macro_rules! unshifted {
-    ($key_code:expr) => { vec![$key_code] }
+    ($key_code:expr) => {
+        vec![$key_code]
+    };
 }
 
 fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
@@ -236,7 +240,7 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
                     vec![]
                 }
             }
-        },
+        }
         // todo: all the remaining key codes
         _ => {
             println!("unknown event: {key_code:?}");
@@ -271,10 +275,10 @@ pub(crate) fn event_handler(app: &mut App, event: Event) {
     match event {
         Event::FocusGained => {
             // todo: handle marking us as actively focused in our window equivalent
-        },
+        }
         Event::FocusLost => {
             // todo: handle marking us as no longer focused in our window equivalent
-        },
+        }
         Event::Key(event) => {
             convert_adapted_keyboard_input(&event)
                 .into_iter()

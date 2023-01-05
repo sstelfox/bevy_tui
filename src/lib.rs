@@ -13,8 +13,8 @@ mod scheduler;
 mod terminal_helpers;
 
 pub mod prelude {
-    pub use crate::MinimalTuiPlugins;
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
+    pub use crate::MinimalTuiPlugins;
 }
 
 use crate::adapted_input::AdaptedKeyboardInput;

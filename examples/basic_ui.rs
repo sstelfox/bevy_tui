@@ -6,11 +6,11 @@ use bevy::app::AppExit;
 use bevy_tui::prelude::*;
 
 use tui::backend::Backend;
-use tui::Frame;
 use tui::layout::{Alignment, Constraint, Layout};
 use tui::style::Style;
 use tui::text::Span;
 use tui::widgets::{Paragraph, Wrap};
+use tui::Frame;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Perform the initial setup of the terminal such as enabling raw mode, switching to the
@@ -59,10 +59,7 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
     f.render_widget(input_paragraph, chunks[1]);
 }
 
-fn run_basic_ui(
-    mut terminal: ResMut<bevy_tui::BevyTerminal>,
-    current_input: Res<Input<KeyCode>>,
-) {
+fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>, current_input: Res<Input<KeyCode>>) {
     terminal
         .0
         .draw(|f| render_ui(f, &current_input))

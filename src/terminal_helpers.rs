@@ -1,12 +1,14 @@
 use std::error::Error;
 use std::io::Write;
 
-use crossterm::{cursor, QueueableCommand};
 use crossterm::event::{
-    EnableBracketedPaste, EnableFocusChange, EnableMouseCapture,
-    DisableBracketedPaste, DisableFocusChange, DisableMouseCapture,
+    DisableBracketedPaste, DisableFocusChange, DisableMouseCapture, EnableBracketedPaste,
+    EnableFocusChange, EnableMouseCapture,
 };
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+};
+use crossterm::{cursor, QueueableCommand};
 use tui::backend::CrosstermBackend;
 
 use crate::{BevyTerminal, Terminal};

@@ -1,10 +1,17 @@
+use std::time::{Duration, Instant};
 
+use bevy::app::{App, AppExit};
+use bevy::ecs::event::{Events, ManualEventReader};
+use bevy::ecs::system::Resource;
+use crossterm::event::{poll as poll_term, read as read_term};
+
+use crate::adapted_input::event_handler;
 
 /// By default the loop will target 4 FPS
 const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(250);
 
 #[derive(Resource)]
-struct TuiPersistentState {
+pub(crate) struct TuiPersistentState {
     first_run: bool,
     last_update: Instant,
     timeout_reached: bool,
@@ -72,7 +79,7 @@ fn tick(
     Ok(Some(Instant::now() - start_time))
 }
 
-fn tui_schedule_runner(mut app: App) {
+pub(crate) fn tui_schedule_runner(mut app: App) {
     let mut app_exit_event_reader = ManualEventReader::<AppExit>::default();
 
     while let Ok(Some(_tick_duration)) = tick(&mut app, &mut app_exit_event_reader) {

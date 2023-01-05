@@ -1,8 +1,10 @@
+use bevy::app::App;
 use bevy::ecs::event::EventReader;
 use bevy::ecs::system::ResMut;
 use bevy::input::keyboard::KeyCode;
 use bevy::input::{ButtonState, Input};
 use bevy::reflect::{FromReflect, Reflect};
+use crossterm::event::Event;
 
 // todo: need to add a serialize feature and use it to add the additional serde and bevy reflect
 // traits to match bevy_winit.
@@ -274,7 +276,7 @@ pub(crate) fn event_handler(app: &mut App, event: Event) {
             // todo: handle marking us as no longer focused in our window equivalent
         },
         Event::Key(event) => {
-            adapted_input::convert_adapted_keyboard_input(&event)
+            convert_adapted_keyboard_input(&event)
                 .into_iter()
                 .for_each(|ki| app.world.send_event(ki));
         }

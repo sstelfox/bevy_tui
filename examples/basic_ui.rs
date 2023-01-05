@@ -3,7 +3,7 @@
 use bevy::prelude::*;
 
 use bevy::app::AppExit;
-use bevy_tui::MinimalTuiPlugins;
+use bevy_tui::prelude::*;
 
 use tui::backend::Backend;
 use tui::Frame;
@@ -15,7 +15,7 @@ use tui::widgets::{Paragraph, Wrap};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Perform the initial setup of the terminal such as enabling raw mode, switching to the
     // alternate mode, enabling mouse control and more.
-    bevy_tui::initialize_terminal()?;
+    initialize_terminal()?;
 
     // MinimalTuiPlugins is the equivalent of Bevy's MinimalPlugins but with a replaced scheduler
     // and input handling.
@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // The changes to the terminal need to be undone before returning the terminal for interactive
     // use. Without doing this the terminal will be in a weird mostly unusable state until it has
     // been reset.
-    bevy_tui::teardown_terminal()?;
+    teardown_terminal()?;
 
     Ok(())
 }

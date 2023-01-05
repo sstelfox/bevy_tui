@@ -1,26 +1,25 @@
 //! A plugin for making interactive Bevy applications with a TUI instead of a graphical interface.
 
-use std::io::Write;
-use std::time::{Duration, Instant};
-
-use bevy::app::{App, AppExit, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::app::{App, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
 use bevy::core::CorePlugin;
-use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::{ButtonState, Input, InputSystem};
 use bevy::prelude::IntoSystemDescriptor;
 use bevy::time::TimePlugin;
 
-use crossterm::event::Event;
-use crossterm::event::{poll as poll_term, read as read_term};
-use crossterm::QueueableCommand;
-
-use crate::adapted_input::{AdaptedKeyboardInput, RawConsoleEvent};
-
 mod adapted_input;
 mod scheduler;
 mod terminal_helpers;
+
+pub mod prelude {
+    pub use crate::MinimalTuiPlugins;
+    pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
+}
+
+use crate::adapted_input::AdaptedKeyboardInput;
+use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
+use crate::terminal_helpers::create_terminal;
 
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);

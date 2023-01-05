@@ -1,22 +1,21 @@
 use std::error::Error;
 use std::io::Write;
 
-use crossterm::QueueableCommand;
+use crossterm::{cursor, QueueableCommand};
 use crossterm::event::{
     EnableBracketedPaste, EnableFocusChange, EnableMouseCapture,
     DisableBracketedPaste, DisableFocusChange, DisableMouseCapture,
 };
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen};
-use tui::Terminal;
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
 use tui::backend::CrosstermBackend;
 
-use crate::BevyTerminal;
+use crate::{BevyTerminal, Terminal};
 
 pub fn create_terminal() -> Result<BevyTerminal, Box<dyn Error>> {
     let stdout = std::io::stdout();
 
     let backend = CrosstermBackend::new(stdout);
-    let terminal = Terminal::new(backend)?;
+    let terminal = tui::Terminal::new(backend)?;
 
     Ok(Terminal(terminal))
 }
@@ -46,12 +45,12 @@ pub fn teardown_terminal() -> Result<(), Box<dyn Error>> {
     disable_raw_mode()?;
 
     let mut stdout = std::io::stdout();
-    stdout.queue(crossterm::terminal::LeaveAlternateScreen)?;
-    stdout.queue(crossterm::event::DisableBracketedPaste)?;
-    stdout.queue(crossterm::event::DisableFocusChange)?;
-    stdout.queue(crossterm::event::DisableMouseCapture)?;
+    stdout.queue(LeaveAlternateScreen)?;
+    stdout.queue(DisableBracketedPaste)?;
+    stdout.queue(DisableFocusChange)?;
+    stdout.queue(DisableMouseCapture)?;
     //stdout.queue(crossterm::event::PopKeyboardEnhancementFlags)?;
-    stdout.queue(crossterm::cursor::Show)?;
+    stdout.queue(cursor::Show)?;
     stdout.flush()?;
 
     Ok(())

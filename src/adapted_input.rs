@@ -41,8 +41,6 @@ pub(crate) fn convert_adapted_keyboard_input(
         })
         .collect();
 
-    // todo: modifiers need to be separate key inputs
-
     events
 }
 
@@ -265,4 +263,33 @@ pub(crate) fn keyboard_input_system(
             ButtonState::Released => key_input.release(event.key_code),
         }
     }
+}
+
+pub(crate) fn event_handler(app: &mut App, event: Event) {
+    match event {
+        Event::FocusGained => {
+            // todo: handle marking us as actively focused in our window equivalent
+        },
+        Event::FocusLost => {
+            // todo: handle marking us as no longer focused in our window equivalent
+        },
+        Event::Key(event) => {
+            adapted_input::convert_adapted_keyboard_input(&event)
+                .into_iter()
+                .for_each(|ki| app.world.send_event(ki));
+        }
+        Event::Mouse(event) => {
+            // todo: begin handling mouse events
+            println!("received mouse event {event:?}\r");
+        }
+        Event::Paste(ref _data) => {
+            // todo: publish event with the pasted content
+            // todo: do I get style info?
+        }
+        Event::Resize(_width, _height) => {
+            // todo: update the size of our window equivalent
+        }
+    }
+
+    app.world.send_event(RawConsoleEvent(event));
 }

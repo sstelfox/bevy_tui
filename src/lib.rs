@@ -94,13 +94,26 @@ impl Plugin for TuiPlugin {
 
 fn event_handler(app: &mut App, event: Event) {
     match event {
-        Event::Key(key) => {
-            adapted_input::convert_adapted_keyboard_input(&key)
+        Event::FocusGained => {
+            // todo: handle marking us as actively focused in our window equivalent
+        },
+        Event::FocusLost => {
+            // todo: handle marking us as no longer focused in our window equivalent
+        },
+        Event::Key(event) => {
+            adapted_input::convert_adapted_keyboard_input(&event)
                 .into_iter()
                 .for_each(|ki| app.world.send_event(ki));
         }
-        _ => {
-            println!("received unknown event: {event:?}\r");
+        Event::Mouse(_event) => {
+            // todo: begin handling mouse events
+        }
+        Event::Paste(ref _data) => {
+            // todo: publish event with the pasted content
+            // todo: do I get style info?
+        }
+        Event::Resize(_width, _height) => {
+            // todo: update the size of our window equivalent
         }
     }
 
@@ -173,6 +186,7 @@ fn tick(
             }
         }
 
+        // Indicate that this tick was triggered by the timeout and not by an event
         app.world
             .resource_mut::<TuiPersistentState>()
             .timeout_reached = !events_available;

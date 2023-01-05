@@ -1,0 +1,13 @@
+# Anything around the repository's policies, CI configuration, access or
+# representatives need special approval
+.cargo/*                        sstelfox@bedroomprogrammers.net
+.github/*                       sstelfox@bedroomprogrammers.net
+tools/ci/*                      sstelfox@bedroomprogrammers.net
+Cargo.toml                      sstelfox@bedroomprogrammers.net
+clippy.toml                     sstelfox@bedroomprogrammers.net
+deny.toml                       sstelfox@bedroomprogrammers.net
+.gitattributes                  sstelfox@bedroomprogrammers.net
+.gitignore                      sstelfox@bedroomprogrammers.net
+LICENSE.txt                     sstelfox@bedroomprogrammers.net
+.rustfmt.yml                    sstelfox@bedroomprogrammers.net
+rust-toolchain                  sstelfox@bedroomprogrammers.net

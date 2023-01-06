@@ -127,8 +127,6 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
         '>' => shifted!(KeyCode::Period),
         '/' => unshifted!(KeyCode::Slash),
         '?' => shifted!(KeyCode::Slash),
-        //'' => unshifted!(KeyCode::),
-        //'' => shifted!(KeyCode::),
         // todo: all the typeable keyboard characters...
         _ => {
             println!(
@@ -195,11 +193,8 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         TerminalKeyCode::BackTab => shifted!(KeyCode::Tab),
         TerminalKeyCode::Delete => vec![KeyCode::Delete],
         TerminalKeyCode::Char(ch) => character_key_code(ch),
-        // todo: all the remaining key codes
-        _ => {
-            println!("unknown event: {key_code:?}");
-            vec![]
-        }
+        // The remaining keycodes are not useful to us
+        _ => { vec![] },
     };
 
     key_codes

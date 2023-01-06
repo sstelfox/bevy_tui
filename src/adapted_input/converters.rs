@@ -173,7 +173,7 @@ fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> Option<ButtonStat
 fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
     use crossterm::event::KeyCode as TerminalKeyCode;
 
-    let key_codes = match key_code {
+    match key_code {
         TerminalKeyCode::Enter => vec![KeyCode::Return],
         TerminalKeyCode::Left => vec![KeyCode::Left],
         TerminalKeyCode::Right => vec![KeyCode::Right],
@@ -194,10 +194,10 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         TerminalKeyCode::Delete => vec![KeyCode::Delete],
         TerminalKeyCode::Char(ch) => character_key_code(ch),
         // The remaining keycodes are not useful to us
-        _ => { vec![] },
-    };
-
-    key_codes
+        _ => {
+            vec![]
+        }
+    }
 }
 
 fn function_key_code(num: u8) -> KeyCode {

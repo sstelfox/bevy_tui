@@ -1,0 +1,15 @@
+[target.'cfg(all())']
+rustflags = [
+  # Strong standard lints
+  #
+  # Exceptions should be made inline on the code that is tripping a particular
+  # lint and not here. The following settings represent project policy and
+  # require the assent of the lead maintainer to change.
+  "-Ddead_code",
+  "-Dmissing-docs",
+  "-Dmissing_doc_code_examples",
+  "-Drustdoc::broken_intra_doc_links",
+  "-Dunsafe_code",
+  "-Dclippy::all",
+  "-Dclippy::pedantic",
+]

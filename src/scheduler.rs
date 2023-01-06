@@ -76,7 +76,7 @@ fn tick(
         }
     }
 
-    Ok(Some(Instant::now() - start_time))
+    Ok(Some(start_time.elapsed()))
 }
 
 pub(crate) fn tui_schedule_runner(mut app: App) {

@@ -33,6 +33,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+// This lint doesn't like values passed in but not consumed which is fair. Bevy requires the
+// `Res<_>` type to be passed by value so we unfortunately have to disable this lint wherever a
+// `Res<_>` is used but not consumed.
+#[allow(clippy::needless_pass_by_value)]
 fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
     if key_code.just_pressed(KeyCode::Q) {
         event_writer.send(AppExit);
@@ -51,7 +55,7 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
 
     f.render_widget(hello_paragraph, chunks[0]);
 
-    let input_content = Span::styled(format!("{:?}", input), Style::default());
+    let input_content = Span::styled(format!("{input:?}"), Style::default());
     let input_paragraph = Paragraph::new(input_content)
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });
@@ -59,6 +63,10 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
     f.render_widget(input_paragraph, chunks[1]);
 }
 
+// This lint doesn't like values passed in but not consumed which is fair. Bevy requires the
+// `Res<_>` type to be passed by value so we unfortunately have to disable this lint wherever a
+// `Res<_>` is used but not consumed.
+#[allow(clippy::needless_pass_by_value)]
 fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>, current_input: Res<Input<KeyCode>>) {
     terminal
         .0

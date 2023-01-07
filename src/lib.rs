@@ -9,12 +9,12 @@
 //! use bevy_tui::prelude::*;
 //!
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     initialize_terminal()?;
+//!     let _ignored_it = initialize_terminal();
 //!
 //!     App::new()
 //!         .add_plugins(MinimalTuiPlugins);
 //!
-//!     teardown_terminal()?;
+//!     let _ignored_tt = teardown_terminal();
 //!
 //!     Ok(())
 //! }
@@ -55,7 +55,8 @@ use crate::terminal_helpers::create_terminal;
 /// ```
 /// use bevy_tui::Terminal;
 ///
-/// Terminal(tui::Terminal::new(tui::backend::CrosstermBackend::new(std::io::stdout())).unwrap());
+/// let mut stdout = Vec::new();
+/// Terminal(tui::Terminal::new(tui::backend::CrosstermBackend::new(stdout)).unwrap());
 /// ```
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);

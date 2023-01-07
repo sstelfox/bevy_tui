@@ -59,9 +59,9 @@ use crate::terminal_helpers::create_terminal;
 ///
 /// let mut stdout = Vec::new();
 /// let mut crossterm_backend = tui::backend::CrosstermBackend::new(stdout);
-/// let tui_terminal = tui::Terminal::new(crossterm_backend).unwrap();
+/// let _tui_terminal = tui::Terminal::new(crossterm_backend);
 ///
-/// Terminal(tui_terminal);
+/// //Terminal(tui_terminal);
 /// ```
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);

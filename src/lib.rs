@@ -53,10 +53,15 @@ use crate::terminal_helpers::create_terminal;
 /// # Examples
 ///
 /// ```
+/// use std::io::Write;
+///
 /// use bevy_tui::Terminal;
 ///
 /// let mut stdout = Vec::new();
-/// Terminal(tui::Terminal::new(tui::backend::CrosstermBackend::new(stdout)).unwrap());
+/// let mut crossterm_backend = tui::backend::CrosstermBackend::new(stdout);
+/// let tui_terminal = tui::Terminal::new(crossterm_backend).unwrap();
+///
+/// Terminal(tui_terminal);
 /// ```
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);

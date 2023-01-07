@@ -9,12 +9,12 @@
 //! use bevy_tui::prelude::*;
 //!
 //! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     let _ignored_it = initialize_terminal();
+//!     //initialize_terminal()?;
 //!
 //!     App::new()
 //!         .add_plugins(MinimalTuiPlugins);
 //!
-//!     let _ignored_tt = teardown_terminal();
+//!     //teardown_terminal()?;
 //!
 //!     Ok(())
 //! }

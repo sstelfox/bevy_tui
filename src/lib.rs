@@ -1,4 +1,24 @@
+#![feature(rustdoc_missing_doc_code_examples)]
+
 //! A plugin for making interactive Bevy applications with a TUI instead of a graphical interface.
+//!
+//! # Examples
+//!
+//! ```
+//! use bevy::prelude::*;
+//! use bevy_tui::prelude::*;
+//!
+//! fn main() -> Result<(), Box<dyn std::error::Error>> {
+//!     //initialize_terminal()?;
+//!
+//!     App::new()
+//!         .add_plugins(MinimalTuiPlugins);
+//!
+//!     //teardown_terminal()?;
+//!
+//!     Ok(())
+//! }
+//! ```
 
 use bevy::app::{App, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
 use bevy::core::CorePlugin;
@@ -20,7 +40,7 @@ mod terminal_helpers;
 /// ```
 pub mod prelude {
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
-    pub use crate::MinimalTuiPlugins;
+    pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
 
 use crate::adapted_input::AdaptedKeyboardInput;
@@ -29,6 +49,20 @@ use crate::terminal_helpers::create_terminal;
 
 /// The Bevy resource that gets exposed to perform frame render operations. This is a thin wrapper
 /// around a [`tui::Terminal`] with no specific backend specified.
+///
+/// # Examples
+///
+/// ```
+/// use std::io::Write;
+///
+/// use bevy_tui::Terminal;
+///
+/// let mut stdout = Vec::new();
+/// let mut crossterm_backend = tui::backend::CrosstermBackend::new(stdout);
+/// let _tui_terminal = tui::Terminal::new(crossterm_backend);
+///
+/// //Terminal(tui_terminal);
+/// ```
 #[derive(Resource)]
 pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
 
@@ -39,6 +73,16 @@ pub type BevyTerminal = Terminal<tui::backend::CrosstermBackend<std::io::Stdout>
 /// A helper plugin group that sets up the bare minimum plugins for use in a Bevy plugin project.
 /// This should be used in place of the Bevy `MinimalPlugins` plugin group as that includes a
 /// conflicting `InputPlugin`.
+///
+/// # Examples
+///
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_tui::prelude::*;
+///
+/// App::new()
+///     .add_plugins(MinimalTuiPlugins);
+/// ```
 pub struct MinimalTuiPlugins;
 
 impl PluginGroup for MinimalTuiPlugins {
@@ -57,6 +101,16 @@ impl PluginGroup for MinimalTuiPlugins {
 ///
 /// If you're experiencing issues with `just_pressed` events, missed events, failures to close the
 /// application, please first check that these plugins have not been included in the Bevy app.
+///
+/// # Examples
+///
+/// ```
+/// use bevy::prelude::*;
+/// use bevy_tui::prelude::*;
+///
+/// App::new()
+///     .add_plugin(TuiPlugin::default());
+/// ```
 #[derive(Default)]
 pub struct TuiPlugin;
 
@@ -86,6 +140,14 @@ impl Plugin for TuiPlugin {
 /// library is currently tied to this particular TUI backend for now. If you're going to be using
 /// text input in your UI, these events are likely what you want over the `Input<KeyCode>` events
 /// as letter casing and non-US/ASCII keyboard characters are preserved.
+///
+/// # Examples
+///
+/// ```
+/// use bevy_tui::RawConsoleEvent;
+///
+/// RawConsoleEvent(crossterm::event::Event::FocusGained);
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RawConsoleEvent(pub crossterm::event::Event);
 

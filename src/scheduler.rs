@@ -26,6 +26,10 @@ impl TuiPersistentState {
         self.first_run = false;
         self.last_update = Instant::now();
     }
+
+    pub(crate) fn timeout_reached(&self) -> bool {
+        self.timeout_reached
+    }
 }
 
 impl Default for TuiPersistentState {

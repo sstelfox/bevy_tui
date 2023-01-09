@@ -141,12 +141,7 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
 pub(super) fn convert_adapted_keyboard_input(
     keyboard_input: &crossterm::event::KeyEvent,
 ) -> Vec<AdaptedKeyboardInput> {
-    let button_state = match convert_input_kind(keyboard_input.kind) {
-        Some(state) => state,
-        None => {
-            return vec![];
-        }
-    };
+    let button_state = convert_input_kind(keyboard_input.kind);
 
     let events: Vec<AdaptedKeyboardInput> = convert_key_code(keyboard_input.code)
         .into_iter()
@@ -159,21 +154,22 @@ pub(super) fn convert_adapted_keyboard_input(
     events
 }
 
-fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> Option<ButtonState> {
+fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> ButtonState {
     use crossterm::event::KeyEventKind;
 
     match kind {
-        KeyEventKind::Press => Some(ButtonState::Pressed),
-        // bevy doesn't have a concept of 'repeat', so we ignore these events for now
-        KeyEventKind::Repeat => None,
-        KeyEventKind::Release => Some(ButtonState::Released),
+        KeyEventKind::Press => ButtonState::Pressed,
+        // bevy doesn't have a concept of 'repeat', we do generate fake release events on our
+        // though so for our purposes we consider this pressed.
+        KeyEventKind::Repeat => ButtonState::Pressed,
+        KeyEventKind::Release => ButtonState::Released,
     }
 }
 
 fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
     use crossterm::event::KeyCode as TerminalKeyCode;
 
-    let key_codes = match key_code {
+    match key_code {
         TerminalKeyCode::Enter => vec![KeyCode::Return],
         TerminalKeyCode::Left => vec![KeyCode::Left],
         TerminalKeyCode::Right => vec![KeyCode::Right],
@@ -194,10 +190,10 @@ fn convert_key_code(key_code: crossterm::event::KeyCode) -> Vec<KeyCode> {
         TerminalKeyCode::Delete => vec![KeyCode::Delete],
         TerminalKeyCode::Char(ch) => character_key_code(ch),
         // The remaining keycodes are not useful to us
-        _ => { vec![] },
-    };
-
-    key_codes
+        _ => {
+            vec![]
+        }
+    }
 }
 
 fn function_key_code(num: u8) -> KeyCode {

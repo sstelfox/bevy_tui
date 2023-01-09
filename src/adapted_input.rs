@@ -6,7 +6,7 @@
 
 use bevy::app::App;
 use bevy::ecs::event::EventReader;
-use bevy::ecs::system::ResMut;
+use bevy::ecs::system::{Res, ResMut};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::{ButtonState, Input};
 use bevy::reflect::{FromReflect, Reflect};
@@ -14,7 +14,7 @@ use crossterm::event::Event;
 
 mod converters;
 
-use crate::RawConsoleEvent;
+use crate::{RawConsoleEvent, TuiPersistentState};
 
 // todo: need to add a serialize feature and use it to add the additional serde and bevy reflect
 // traits to match bevy_winit.
@@ -33,9 +33,18 @@ pub(crate) struct AdaptedKeyboardInput {
 }
 
 pub(crate) fn keyboard_input_system(
+    tui_state: Res<TuiPersistentState>,
     mut key_input: ResMut<Input<KeyCode>>,
     mut keyboard_input_events: EventReader<AdaptedKeyboardInput>,
 ) {
+    // We only want to change input states when we're triggered by events. If the timeout was
+    // reached then this system tick was triggered based on that.
+    // TODO: When we support timer only scheduling this will need to change as we'll only be
+    // processing events when the timeout gets reached.
+    if tui_state.timeout_reached() {
+        return;
+    }
+
     // We don't get key release events from the terminal. There is an enhancement in the kitty
     // protocol that extends the system to include these but we can't rely on them. Instead we
     // attempt to generate our own release events based on whether the key is still pressed.

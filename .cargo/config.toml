@@ -7,8 +7,8 @@ rustflags = [
   # require the assent of the lead maintainer to change.
   "-Ddead_code",
   "-Dmissing-docs",
-  "-Dmissing_doc_code_examples",
   "-Drustdoc::broken_intra_doc_links",
+  "-Drustdoc::missing_doc_code_examples",
   "-Dunsafe_code",
   "-Dclippy::all",
   "-Dclippy::pedantic",

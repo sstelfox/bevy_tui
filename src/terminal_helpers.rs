@@ -8,7 +8,7 @@ use crossterm::event::{
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
-use crossterm::{cursor, QueueableCommand};
+use crossterm::QueueableCommand;
 use tui::backend::CrosstermBackend;
 
 use crate::{BevyTerminal, Terminal};
@@ -16,6 +16,11 @@ use crate::{BevyTerminal, Terminal};
 /// Helper method for creating a crossterm backed TUI terminal object. Currently only the crossterm
 /// backend is supported but this will be expanded once all of the minimal functionality has been
 /// implemented to my satisfaction.
+///
+/// # Errors
+///
+/// The Terminal will fail to be created if STDOUT isn't available, or not a terminal. See
+/// [`tui::Terminal::new`] for details on the failure cases.
 pub(crate) fn create_terminal() -> Result<BevyTerminal, Box<dyn Error>> {
     let stdout = std::io::stdout();
 
@@ -50,12 +55,6 @@ pub fn initialize_terminal() -> Result<(), Box<dyn Error>> {
     // TODO: Make this a setting for the application
     //stdout.queue(crossterm::terminal::SetTitle("Hello Bevy"))?;
 
-    //stdout.queue(crossterm::event::PushKeyboardEnhancementFlags(
-    //    crossterm::event::KeyboardEnhancementFlags::DISAMBIGUATE_ESCAPE_CODES
-    //        | crossterm::event::KeyboardEnhancementFlags::REPORT_EVENT_TYPES
-    //        | crossterm::event::KeyboardEnhancementFlags::REPORT_ALL_KEYS_AS_ESCAPE_CODES,
-    //))?;
-
     stdout.flush().expect("terminal command trigger");
 
     Ok(())
@@ -76,8 +75,6 @@ pub fn teardown_terminal() -> Result<(), Box<dyn Error>> {
     stdout.queue(DisableBracketedPaste)?;
     stdout.queue(DisableFocusChange)?;
     stdout.queue(DisableMouseCapture)?;
-    //stdout.queue(crossterm::event::PopKeyboardEnhancementFlags)?;
-    stdout.queue(cursor::Show)?;
     stdout.flush()?;
 
     Ok(())

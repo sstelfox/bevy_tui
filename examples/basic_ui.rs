@@ -43,9 +43,13 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
+fn render_ui<B: Backend>(f: &mut Frame<B>, keyboard: &Input<KeyCode>, mouse: &Input<MouseButton>) {
     let chunks = Layout::default()
-        .constraints([Constraint::Length(1), Constraint::Percentage(100)].as_ref())
+        .constraints([
+            Constraint::Length(1),
+            Constraint::Length(1),
+            Constraint::Percentage(100),
+        ].as_ref())
         .split(f.size());
 
     let hello_content = Span::styled("Hello Bevy! Press 'q' to quit.", Style::default());
@@ -55,21 +59,28 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, input: &Input<KeyCode>) {
 
     f.render_widget(hello_paragraph, chunks[0]);
 
-    let input_content = Span::styled(format!("{input:?}"), Style::default());
-    let input_paragraph = Paragraph::new(input_content)
+    let keyboard_content = Span::styled(format!("Keyboard: {keyboard:?}"), Style::default());
+    let keyboard_paragraph = Paragraph::new(keyboard_content)
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });
 
-    f.render_widget(input_paragraph, chunks[1]);
+    f.render_widget(keyboard_paragraph, chunks[1]);
+
+    let mouse_content = Span::styled(format!("Mouse Buttons: {mouse:?}"), Style::default());
+    let mouse_paragraph = Paragraph::new(mouse_content)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(mouse_paragraph, chunks[2]);
 }
 
 // This lint doesn't like values passed in but not consumed which is fair. Bevy requires the
 // `Res<_>` type to be passed by value so we unfortunately have to disable this lint wherever a
 // `Res<_>` is used but not consumed.
 #[allow(clippy::needless_pass_by_value)]
-fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>, current_input: Res<Input<KeyCode>>) {
+fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>, keyboard: Res<Input<KeyCode>>, mouse: Res<Input<MouseButton>>) {
     terminal
         .0
-        .draw(|f| render_ui(f, &current_input))
+        .draw(|f| render_ui(f, &keyboard, &mouse))
         .expect("failed to draw to terminal");
 }

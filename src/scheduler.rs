@@ -5,7 +5,7 @@ use bevy::ecs::event::{Events, ManualEventReader};
 use bevy::ecs::system::Resource;
 use crossterm::event::{poll as poll_term, read as read_term};
 
-use crate::adapted_input::event_handler;
+use crate::input::event_handler;
 
 /// By default the loop will target 4 FPS
 const DEFAULT_LOOP_DELAY: Duration = Duration::from_millis(250);
@@ -25,10 +25,6 @@ impl TuiPersistentState {
     fn mark_completed_tick(&mut self) {
         self.first_run = false;
         self.last_update = Instant::now();
-    }
-
-    pub(crate) fn timeout_reached(&self) -> bool {
-        self.timeout_reached
     }
 }
 

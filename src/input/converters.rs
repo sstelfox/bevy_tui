@@ -1,7 +1,9 @@
 use bevy::input::keyboard::KeyCode;
+// todo: do I get mouse scroll events?
+use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::ButtonState;
 
-use crate::adapted_input::AdaptedKeyboardInput;
+use crate::input::{KeyboardInput, MouseInput};
 
 macro_rules! shifted {
     ($key_code:expr) => {
@@ -138,20 +140,49 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
     }
 }
 
-pub(super) fn convert_adapted_keyboard_input(
+pub(super) fn convert_keyboard_input(
     keyboard_input: &crossterm::event::KeyEvent,
-) -> Vec<AdaptedKeyboardInput> {
+) -> Vec<KeyboardInput> {
     let button_state = convert_input_kind(keyboard_input.kind);
 
-    let events: Vec<AdaptedKeyboardInput> = convert_key_code(keyboard_input.code)
+    let events: Vec<KeyboardInput> = convert_key_code(keyboard_input.code)
         .into_iter()
-        .map(|key_code| AdaptedKeyboardInput {
+        .map(|key_code| KeyboardInput {
             key_code,
             state: button_state,
         })
         .collect();
 
     events
+}
+
+pub(super) fn convert_mouse_input(
+    mouse_input: &crossterm::event::MouseEvent
+) -> MouseInput {
+    use crossterm::event::MouseEventKind;
+
+    let location = [mouse_input.column, mouse_input.row];
+
+    match mouse_input.kind {
+        MouseEventKind::Down(btn) | MouseEventKind::Drag(btn) => {
+            MouseInput::Button(convert_mouse_button(btn), ButtonState::Pressed, location)
+        }
+        MouseEventKind::Up(btn) => {
+            MouseInput::Button(convert_mouse_button(btn), ButtonState::Released, location)
+        }
+        MouseEventKind::Moved => { MouseInput::Movement(location) }
+        MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
+            unimplemented!("{mouse_input:?}\r");
+        }
+    }
+}
+
+fn convert_mouse_button(button: crossterm::event::MouseButton) -> MouseButton {
+    match button {
+        crossterm::event::MouseButton::Left => MouseButton::Left,
+        crossterm::event::MouseButton::Middle => MouseButton::Middle,
+        crossterm::event::MouseButton::Right => MouseButton::Right,
+    }
 }
 
 fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> ButtonState {

@@ -37,18 +37,26 @@ pub(crate) fn keyboard_input_system(
     mut keyboard_input_events: EventReader<AdaptedKeyboardInput>,
 ) {
     // We don't get key release events from the terminal. There is an enhancement in the kitty
-    // protocol that extends the system to include these but we can't rely on them. This system
-    // effectively clears our current key events.
-    //
-    // todo: in the future I should either detect whether the releases are supported in the
-    // terminal or base it off of if I receive a release event.
-    key_input.reset_all();
+    // protocol that extends the system to include these but we can't rely on them. Instead we
+    // attempt to generate our own release events based on whether the key is still pressed.
+    key_input.clear();
+
+    let currently_pressed: Vec<KeyCode> = key_input.get_pressed().map(|k| *k).collect();
+    let mut pressed_events = vec![];
 
     for event in keyboard_input_events.iter() {
         match event.state {
-            ButtonState::Pressed => key_input.press(event.key_code),
+            ButtonState::Pressed => {
+                pressed_events.push(event.key_code);
+                key_input.press(event.key_code);
+            },
             ButtonState::Released => key_input.release(event.key_code),
         }
+    }
+
+    // TODO: Make release event emulation an option
+    for released_key in currently_pressed.into_iter().filter(|kc| !pressed_events.iter().any(|pe| pe == kc)) {
+        key_input.release(released_key);
     }
 }
 

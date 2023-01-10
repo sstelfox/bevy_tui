@@ -50,13 +50,16 @@ fn render_ui<B: Backend>(
     mouse_state: &MouseState,
 ) {
     let chunks = Layout::default()
-        .constraints([
-            Constraint::Length(1),
-            Constraint::Length(1),
-            Constraint::Length(1),
-            Constraint::Length(1),
-            Constraint::Min(0),
-        ].as_ref())
+        .constraints(
+            [
+                Constraint::Length(1),
+                Constraint::Length(1),
+                Constraint::Length(1),
+                Constraint::Length(1),
+                Constraint::Min(0),
+            ]
+            .as_ref(),
+        )
         .split(f.size());
 
     let hello_content = Span::styled("Hello Bevy! Press 'q' to quit.", Style::default());
@@ -80,7 +83,8 @@ fn render_ui<B: Backend>(
 
     f.render_widget(mouse_paragraph, chunks[2]);
 
-    let mouse_state_content = Span::styled(format!("Mouse State: {mouse_state:?}"), Style::default());
+    let mouse_state_content =
+        Span::styled(format!("Mouse State: {mouse_state:?}"), Style::default());
     let mouse_state_paragraph = Paragraph::new(mouse_state_content)
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });

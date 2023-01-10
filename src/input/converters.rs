@@ -141,7 +141,7 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
 }
 
 pub(super) fn convert_keyboard_input(
-    keyboard_input: &crossterm::event::KeyEvent,
+    keyboard_input: crossterm::event::KeyEvent,
 ) -> Vec<KeyboardInput> {
     let button_state = convert_input_kind(keyboard_input.kind);
 
@@ -156,9 +156,7 @@ pub(super) fn convert_keyboard_input(
     events
 }
 
-pub(super) fn convert_mouse_input(
-    mouse_input: &crossterm::event::MouseEvent
-) -> MouseInput {
+pub(super) fn convert_mouse_input(mouse_input: crossterm::event::MouseEvent) -> MouseInput {
     use crossterm::event::MouseEventKind;
 
     // TODO: I need to convert this to Bevy's coordinate system, maybe I need to do it somewhere
@@ -172,7 +170,7 @@ pub(super) fn convert_mouse_input(
         MouseEventKind::Up(btn) => {
             MouseInput::Button(convert_mouse_button(btn), ButtonState::Released, location)
         }
-        MouseEventKind::Moved => { MouseInput::Movement(location) }
+        MouseEventKind::Moved => MouseInput::Movement(location),
         MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
             unimplemented!("{mouse_input:?}\r");
         }
@@ -191,10 +189,9 @@ fn convert_input_kind(kind: crossterm::event::KeyEventKind) -> ButtonState {
     use crossterm::event::KeyEventKind;
 
     match kind {
-        KeyEventKind::Press => ButtonState::Pressed,
         // bevy doesn't have a concept of 'repeat', we do generate fake release events on our
         // though so for our purposes we consider this pressed.
-        KeyEventKind::Repeat => ButtonState::Pressed,
+        KeyEventKind::Press | KeyEventKind::Repeat => ButtonState::Pressed,
         KeyEventKind::Release => ButtonState::Released,
     }
 }

@@ -33,6 +33,9 @@ pub(crate) struct KeyboardInput {
     state: ButtonState,
 }
 
+// This enum name triggers one of the pedantic clippy modules which I generally agree with, but in
+// this case we're matching the name of the similar data structure in Bevy proper.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, Copy, PartialEq, Reflect, FromReflect)]
 pub enum MouseInput {
     Button(MouseButton, ButtonState, [u16; 2]),
@@ -54,7 +57,11 @@ pub(crate) fn keyboard_input_system(
     // attempt to generate our own release events based on whether the key is still pressed.
     key_input.clear();
 
-    let currently_pressed: Vec<KeyCode> = key_input.get_pressed().map(|k| *k).collect();
+    // This collect isn't needless as the `key_input.press` happening a little bit further on
+    // mutates this state changing what we would receive as a result if we delayed the use of the
+    // iterator.
+    #[allow(clippy::needless_collect)]
+    let currently_pressed: Vec<KeyCode> = key_input.get_pressed().copied().collect();
     let mut pressed_events = vec![];
 
     for event in keyboard_input_events.iter() {
@@ -62,7 +69,7 @@ pub(crate) fn keyboard_input_system(
             ButtonState::Pressed => {
                 pressed_events.push(event.key_code);
                 key_input.press(event.key_code);
-            },
+            }
             ButtonState::Released => key_input.release(event.key_code),
         }
     }
@@ -72,7 +79,10 @@ pub(crate) fn keyboard_input_system(
     // delays for the duration of a frame we'll generate a release event before the repeated
     // characters start coming in. I could make this less likely by delaying release events until
     // the end of the next tick or something like that... But it works well enough for now
-    for released_key in currently_pressed.into_iter().filter(|kc| !pressed_events.iter().any(|pe| pe == kc)) {
+    for released_key in currently_pressed
+        .into_iter()
+        .filter(|kc| !pressed_events.iter().any(|pe| pe == kc))
+    {
         key_input.release(released_key);
     }
 }
@@ -87,15 +97,14 @@ pub(crate) fn mouse_input_system(
 
     for event in mouse_input_events.iter() {
         let new_location = match event {
-            MouseInput::Button(_, _, loc) => loc,
-            MouseInput::Movement(loc) => loc,
+            MouseInput::Button(_, _, loc) | MouseInput::Movement(loc) => loc,
         };
 
         if let Some(last_location) = mouse_state.last_location {
             mouse_motion_event_writer.send(MouseMotion {
                 delta: bevy::math::Vec2 {
-                    x: new_location[0] as f32 - last_location[0] as f32,
-                    y: new_location[1] as f32 - last_location[1] as f32,
+                    x: f32::from(new_location[0]) - f32::from(last_location[0]),
+                    y: f32::from(new_location[1]) - f32::from(last_location[1]),
                 },
             });
         }
@@ -117,12 +126,12 @@ pub(crate) fn event_handler(app: &mut App, event: Event) {
             // todo: handle marking us as focused/unfocused in our window equivalent
         }
         Event::Key(event) => {
-            converters::convert_keyboard_input(&event)
+            converters::convert_keyboard_input(event)
                 .into_iter()
                 .for_each(|ki| app.world.send_event(ki));
         }
         Event::Mouse(event) => {
-            app.world.send_event(converters::convert_mouse_input(&event));
+            app.world.send_event(converters::convert_mouse_input(event));
         }
         Event::Paste(ref _data) => {
             // todo: publish event with the pasted content

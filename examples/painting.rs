@@ -19,9 +19,7 @@ struct BoundedCamera {
 
 impl Default for BoundedCamera {
     fn default() -> Self {
-        Self {
-            position: [127; 2],
-        }
+        Self { position: [127; 2] }
     }
 }
 
@@ -51,6 +49,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+// The resource can not be passed by value as we need this signature for Bevy to recognize it as a
+// system.
+#[allow(clippy::needless_pass_by_value)]
 fn camera_controller(key_code: Res<Input<KeyCode>>, mut camera: ResMut<BoundedCamera>) {
     // Up
     if key_code.pressed(KeyCode::K) {
@@ -80,11 +81,7 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: Backend>(
-    f: &mut Frame<B>,
-    camera: &BoundedCamera,
-    canvas_data: &CanvasData,
-) {
+fn render_ui<B: Backend>(f: &mut Frame<B>, camera: &BoundedCamera, canvas_data: &CanvasData) {
     // Render canvas to the entirety of the screen
     let canvas = f.size();
 
@@ -104,7 +101,10 @@ fn render_ui<B: Backend>(
     let camera_position_text_rect = camera_position_block.inner(camera_position_rect);
     f.render_widget(camera_position_block, camera_position_rect);
 
-    let pos_content = Span::styled(format!("X: {:3}, Y: {:3}", camera.position[0], camera.position[1]), Style::default());
+    let pos_content = Span::styled(
+        format!("X: {:3}, Y: {:3}", camera.position[0], camera.position[1]),
+        Style::default(),
+    );
     let pos_paragraph = Paragraph::new(pos_content)
         .alignment(Alignment::Center)
         .wrap(Wrap { trim: true });

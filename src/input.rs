@@ -102,9 +102,6 @@ pub(crate) fn mouse_input_system(
 
         mouse_state.last_location = Some(*new_location);
 
-        // todo: generate delta mouse input
-        // todo: update current location in mouse_input
-
         if let MouseInput::Button(btn, state, _) = event {
             match state {
                 ButtonState::Pressed => mouse_input.press(*btn),

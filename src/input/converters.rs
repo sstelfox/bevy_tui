@@ -161,6 +161,8 @@ pub(super) fn convert_mouse_input(
 ) -> MouseInput {
     use crossterm::event::MouseEventKind;
 
+    // TODO: I need to convert this to Bevy's coordinate system, maybe I need to do it somewhere
+    // else that could get access to the window size?
     let location = [mouse_input.column, mouse_input.row];
 
     match mouse_input.kind {

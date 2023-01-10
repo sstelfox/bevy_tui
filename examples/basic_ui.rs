@@ -55,7 +55,7 @@ fn render_ui<B: Backend>(
             Constraint::Length(1),
             Constraint::Length(1),
             Constraint::Length(1),
-            Constraint::Percentage(100),
+            Constraint::Min(0),
         ].as_ref())
         .split(f.size());
 

@@ -1,6 +1,6 @@
 use bevy::input::keyboard::KeyCode;
 // todo: do I get mouse scroll events?
-use bevy::input::mouse::{MouseButton, MouseMotion};
+use bevy::input::mouse::MouseButton;
 use bevy::input::ButtonState;
 
 use crate::input::{KeyboardInput, MouseInput};

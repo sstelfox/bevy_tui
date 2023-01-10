@@ -5,10 +5,10 @@
 #![allow(clippy::disallowed_methods)]
 
 use bevy::app::App;
-use bevy::ecs::event::EventReader;
-use bevy::ecs::system::ResMut;
+use bevy::ecs::event::{EventReader, EventWriter};
+use bevy::ecs::system::{ResMut, Resource};
 use bevy::input::keyboard::KeyCode;
-use bevy::input::mouse::MouseButton;
+use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input};
 use bevy::reflect::{FromReflect, Reflect};
 use crossterm::event::Event;
@@ -34,9 +34,15 @@ pub(crate) struct KeyboardInput {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Reflect, FromReflect)]
-pub(crate) enum MouseInput {
+pub enum MouseInput {
     Button(MouseButton, ButtonState, [u16; 2]),
     Movement([u16; 2]),
+}
+
+/// TODO: write documentation
+#[derive(Debug, Default, FromReflect, Reflect, Resource)]
+pub struct MouseState {
+    last_location: Option<[u16; 2]>,
 }
 
 pub(crate) fn keyboard_input_system(
@@ -73,15 +79,28 @@ pub(crate) fn keyboard_input_system(
 
 pub(crate) fn mouse_input_system(
     mut mouse_input: ResMut<Input<MouseButton>>,
+    mut mouse_state: ResMut<MouseState>,
     mut mouse_input_events: EventReader<MouseInput>,
+    mut mouse_motion_event_writer: EventWriter<MouseMotion>,
 ) {
     mouse_input.clear();
 
     for event in mouse_input_events.iter() {
-        let _location = match event {
+        let new_location = match event {
             MouseInput::Button(_, _, loc) => loc,
             MouseInput::Movement(loc) => loc,
         };
+
+        if let Some(last_location) = mouse_state.last_location {
+            mouse_motion_event_writer.send(MouseMotion {
+                delta: bevy::math::Vec2 {
+                    x: new_location[0] as f32 - last_location[0] as f32,
+                    y: new_location[1] as f32 - last_location[1] as f32,
+                },
+            });
+        }
+
+        mouse_state.last_location = Some(*new_location);
 
         // todo: generate delta mouse input
         // todo: update current location in mouse_input

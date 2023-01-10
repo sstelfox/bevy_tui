@@ -43,9 +43,16 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: Backend>(f: &mut Frame<B>, keyboard: &Input<KeyCode>, mouse: &Input<MouseButton>) {
+fn render_ui<B: Backend>(
+    f: &mut Frame<B>,
+    keyboard: &Input<KeyCode>,
+    mouse: &Input<MouseButton>,
+    mouse_state: &MouseState,
+) {
     let chunks = Layout::default()
         .constraints([
+            Constraint::Length(1),
+            Constraint::Length(1),
             Constraint::Length(1),
             Constraint::Length(1),
             Constraint::Percentage(100),
@@ -72,15 +79,27 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, keyboard: &Input<KeyCode>, mouse: &In
         .wrap(Wrap { trim: true });
 
     f.render_widget(mouse_paragraph, chunks[2]);
+
+    let mouse_state_content = Span::styled(format!("Mouse State: {mouse_state:?}"), Style::default());
+    let mouse_state_paragraph = Paragraph::new(mouse_state_content)
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+    f.render_widget(mouse_state_paragraph, chunks[3]);
 }
 
 // This lint doesn't like values passed in but not consumed which is fair. Bevy requires the
 // `Res<_>` type to be passed by value so we unfortunately have to disable this lint wherever a
 // `Res<_>` is used but not consumed.
 #[allow(clippy::needless_pass_by_value)]
-fn run_basic_ui(mut terminal: ResMut<bevy_tui::BevyTerminal>, keyboard: Res<Input<KeyCode>>, mouse: Res<Input<MouseButton>>) {
+fn run_basic_ui(
+    mut terminal: ResMut<bevy_tui::BevyTerminal>,
+    keyboard: Res<Input<KeyCode>>,
+    mouse: Res<Input<MouseButton>>,
+    mouse_state: Res<MouseState>,
+) {
     terminal
         .0
-        .draw(|f| render_ui(f, &keyboard, &mouse))
+        .draw(|f| render_ui(f, &keyboard, &mouse, &mouse_state))
         .expect("failed to draw to terminal");
 }

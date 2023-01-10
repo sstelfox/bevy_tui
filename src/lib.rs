@@ -41,6 +41,7 @@ mod terminal_helpers;
 /// use bevy_tui::prelude::*;
 /// ```
 pub mod prelude {
+    pub use crate::input::MouseState;
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
     pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
@@ -134,6 +135,7 @@ impl Plugin for TuiPlugin {
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
             .init_resource::<Input<MouseButton>>()
+            .init_resource::<input::MouseState>()
             .add_system_to_stage(
                 CoreStage::PreUpdate,
                 input::mouse_input_system.label(InputSystem),
@@ -147,7 +149,8 @@ impl Plugin for TuiPlugin {
 
         // Register the mouse types
         app.register_type::<MouseButton>()
-            .register_type::<MouseMotion>();
+            .register_type::<MouseMotion>()
+            .register_type::<input::MouseState>();
     }
 }
 

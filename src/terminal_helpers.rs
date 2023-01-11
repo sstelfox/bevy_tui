@@ -8,7 +8,7 @@ use crossterm::event::{
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
-use crossterm::{cursor, QueueableCommand};
+use crossterm::QueueableCommand;
 use tui::backend::CrosstermBackend;
 
 use crate::{BevyTerminal, Terminal};

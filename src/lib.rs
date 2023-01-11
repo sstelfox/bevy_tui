@@ -25,11 +25,12 @@ use bevy::app::{App, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
 use bevy::core::CorePlugin;
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
+use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
 use bevy::prelude::IntoSystemDescriptor;
 use bevy::time::TimePlugin;
 
-mod adapted_input;
+mod input;
 mod scheduler;
 mod terminal_helpers;
 
@@ -40,11 +41,12 @@ mod terminal_helpers;
 /// use bevy_tui::prelude::*;
 /// ```
 pub mod prelude {
+    pub use crate::input::MouseState;
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
     pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
 
-use crate::adapted_input::AdaptedKeyboardInput;
+use crate::input::{KeyboardInput, MouseInput};
 use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
 use crate::terminal_helpers::create_terminal;
 
@@ -123,20 +125,32 @@ impl Plugin for TuiPlugin {
         app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
             .add_startup_system(terminal_setup)
-            .add_event::<adapted_input::AdaptedKeyboardInput>()
+            .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
             .init_resource::<Input<KeyCode>>()
             .add_system_to_stage(
                 CoreStage::PreUpdate,
-                adapted_input::keyboard_input_system.label(InputSystem),
+                input::keyboard_input_system.label(InputSystem),
+            )
+            .add_event::<MouseInput>()
+            .add_event::<MouseMotion>()
+            .init_resource::<Input<MouseButton>>()
+            .init_resource::<input::MouseState>()
+            .add_system_to_stage(
+                CoreStage::PreUpdate,
+                input::mouse_input_system.label(InputSystem),
             );
 
         // Register the common type
         app.register_type::<ButtonState>();
 
         // Register keyboard types
-        app.register_type::<AdaptedKeyboardInput>()
-            .register_type::<KeyCode>();
+        app.register_type::<KeyCode>();
+
+        // Register the mouse types
+        app.register_type::<MouseButton>()
+            .register_type::<MouseMotion>()
+            .register_type::<input::MouseState>();
     }
 }
 

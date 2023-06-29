@@ -12,9 +12,9 @@ repository = "https://github.com/sstelfox/bevy_tui"
 documentation = "https://docs.rs/bevy_tui/"
 
 [dependencies]
-crossterm = "^0.25"
-tui = "^0.19"
 bevy = { default-features = false, version = "^0.10" }
+crossterm = "^0.26"
+tui = {package = "ratatui", version = "0.21"}
 
 [lib]
 name = "bevy_tui"

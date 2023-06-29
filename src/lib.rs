@@ -1,5 +1,4 @@
 #![feature(rustdoc_missing_doc_code_examples)]
-
 //! A plugin for making interactive Bevy applications with a TUI instead of a graphical interface.
 //!
 //! # Examples
@@ -21,13 +20,12 @@
 //! }
 //! ```
 
-use bevy::app::{App, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
-use bevy::core::CorePlugin;
+use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
-use bevy::prelude::IntoSystemDescriptor;
+use bevy::prelude::{CoreSet, IntoSystemConfig, TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::time::TimePlugin;
 
 mod input;
@@ -93,7 +91,8 @@ pub struct MinimalTuiPlugins;
 impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
-            .add(CorePlugin::default())
+            .add(TaskPoolPlugin::default())
+            .add(TypeRegistrationPlugin::default())
             .add(TimePlugin::default())
             .add(TuiPlugin::default())
     }
@@ -128,17 +127,19 @@ impl Plugin for TuiPlugin {
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
             .init_resource::<Input<KeyCode>>()
-            .add_system_to_stage(
-                CoreStage::PreUpdate,
-                input::keyboard_input_system.label(InputSystem),
+            .add_system(
+                input::keyboard_input_system
+                    .in_set(InputSystem)
+                    .in_base_set(CoreSet::PreUpdate),
             )
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
             .init_resource::<Input<MouseButton>>()
             .init_resource::<input::MouseState>()
-            .add_system_to_stage(
-                CoreStage::PreUpdate,
-                input::mouse_input_system.label(InputSystem),
+            .add_system(
+                input::mouse_input_system
+                    .in_set(InputSystem)
+                    .in_base_set(CoreSet::PreUpdate),
             );
 
         // Register the common type

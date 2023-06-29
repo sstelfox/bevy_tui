@@ -1,6 +1,6 @@
 [package]
 name = "bevy_tui"
-version = "0.9.1"
+version = "0.10.1"
 edition = "2021"
 authors = ["Sam Stelfox"]
 description = "A plugin for making interactive Bevy applications with a TUI instead of a graphical interface."
@@ -12,9 +12,9 @@ repository = "https://github.com/sstelfox/bevy_tui"
 documentation = "https://docs.rs/bevy_tui/"
 
 [dependencies]
-bevy = { default-features = false, version = "^0.9" }
 crossterm = "^0.25"
 tui = "^0.19"
+bevy = { default-features = false, version = "^0.10" }
 
 [lib]
 name = "bevy_tui"

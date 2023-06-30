@@ -92,9 +92,9 @@ impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(TaskPoolPlugin::default())
-            .add(TypeRegistrationPlugin::default())
-            .add(TimePlugin::default())
-            .add(TuiPlugin::default())
+            .add(TypeRegistrationPlugin)
+            .add(TimePlugin)
+            .add(TuiPlugin)
     }
 }
 

@@ -27,6 +27,7 @@ use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
 use bevy::prelude::{CoreSet, IntoSystemConfig, TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::time::TimePlugin;
+use input::WindowResized;
 
 mod input;
 mod scheduler;
@@ -126,6 +127,7 @@ impl Plugin for TuiPlugin {
             .add_startup_system(terminal_setup)
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
+            .add_event::<WindowResized>()
             .init_resource::<Input<KeyCode>>()
             .add_system(
                 input::keyboard_input_system

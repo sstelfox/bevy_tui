@@ -48,6 +48,9 @@ pub struct MouseState {
     last_location: Option<[u16; 2]>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Reflect, FromReflect)]
+pub struct WindowResized;
+
 pub(crate) fn keyboard_input_system(
     mut key_input: ResMut<Input<KeyCode>>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
@@ -138,7 +141,8 @@ pub(crate) fn event_handler(app: &mut App, event: Event) {
             // todo: do I get style info?
         }
         Event::Resize(_width, _height) => {
-            // todo: update the size of our window equivalent
+            // TODO: update the size of our window equivalent
+            app.world.send_event(WindowResized);
         }
     }
 

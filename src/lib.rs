@@ -27,7 +27,6 @@ use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
 use bevy::prelude::{CoreSet, IntoSystemConfig, TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::time::TimePlugin;
-use input::WindowResized;
 
 mod input;
 mod scheduler;
@@ -40,12 +39,12 @@ mod terminal_helpers;
 /// use bevy_tui::prelude::*;
 /// ```
 pub mod prelude {
-    pub use crate::input::MouseState;
+    pub use crate::input::{MouseState, WindowResized};
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
     pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
 
-use crate::input::{KeyboardInput, MouseInput};
+use crate::input::{KeyboardInput, MouseInput, WindowResized};
 use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
 use crate::terminal_helpers::create_terminal;
 

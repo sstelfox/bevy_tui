@@ -49,6 +49,7 @@ pub struct MouseState {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Reflect, FromReflect)]
+/// TODO: write documentation
 pub struct WindowResized;
 
 pub(crate) fn keyboard_input_system(

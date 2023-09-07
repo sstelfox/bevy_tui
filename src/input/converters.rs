@@ -132,7 +132,7 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
         // todo: all the typeable keyboard characters...
         _ => {
             println!(
-                "unknown typable keyboard character: '{chr}' ({})",
+                "unknown typeable keyboard character: '{chr}' ({})",
                 chr as u32
             );
             vec![]

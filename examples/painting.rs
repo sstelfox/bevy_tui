@@ -39,9 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_plugins(MinimalTuiPlugins)
         .init_resource::<BoundedCamera>()
         .init_resource::<CanvasData>()
-        .add_system(camera_controller)
-        .add_system(run_canvas_ui)
-        .add_system(quit_on_esc)
+        .add_systems(Update, (camera_controller, run_canvas_ui, quit_on_esc))
         .run();
 
     teardown_terminal()?;

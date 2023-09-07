@@ -11,6 +11,7 @@ use tui::style::Style;
 use tui::text::Span;
 use tui::widgets::{Paragraph, Wrap};
 use tui::Frame;
+use tui::prelude::Direction;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Perform the initial setup of the terminal such as enabling raw mode, switching to the
@@ -21,8 +22,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // and input handling.
     App::new()
         .add_plugins(MinimalTuiPlugins)
-        .add_system(run_basic_ui)
-        .add_system(quit_on_esc)
+        .add_systems(Update, (run_basic_ui, quit_on_esc))
         .run();
 
     // The changes to the terminal need to be undone before returning the terminal for interactive
@@ -50,6 +50,7 @@ fn render_ui<B: Backend>(
     mouse_state: &MouseState,
 ) {
     let chunks = Layout::default()
+        .direction(Direction::Vertical)
         .constraints(
             [
                 Constraint::Length(1),

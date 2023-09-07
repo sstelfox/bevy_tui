@@ -1,4 +1,5 @@
 #![feature(rustdoc_missing_doc_code_examples)]
+
 //! A plugin for making interactive Bevy applications with a TUI instead of a graphical interface.
 //!
 //! # Examples
@@ -20,12 +21,13 @@
 //! }
 //! ```
 
-use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::app::{App, Startup, PreUpdate, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::core::{TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
-use bevy::prelude::{CoreSet, IntoSystemConfig, TaskPoolPlugin, TypeRegistrationPlugin};
+use bevy::prelude::{Event, IntoSystemConfigs};
 use bevy::time::TimePlugin;
 
 mod input;
@@ -44,7 +46,7 @@ pub mod prelude {
     pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
 
-use crate::input::{KeyboardInput, MouseInput, WindowResized};
+use crate::input::{KeyboardInput, MouseInput};
 use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
 use crate::terminal_helpers::create_terminal;
 
@@ -92,9 +94,9 @@ impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(TaskPoolPlugin::default())
-            .add(TypeRegistrationPlugin)
-            .add(TimePlugin)
-            .add(TuiPlugin)
+            .add(TypeRegistrationPlugin::default())
+            .add(TimePlugin::default())
+            .add(TuiPlugin::default())
     }
 }
 
@@ -113,7 +115,7 @@ impl PluginGroup for MinimalTuiPlugins {
 /// use bevy_tui::prelude::*;
 ///
 /// App::new()
-///     .add_plugin(TuiPlugin::default())
+///     .add_plugins(TuiPlugin::default())
 ///     .run();
 /// ```
 #[derive(Default)]
@@ -123,24 +125,21 @@ impl Plugin for TuiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
-            .add_startup_system(terminal_setup)
+            .add_systems(Startup,terminal_setup)
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
-            .add_event::<WindowResized>()
             .init_resource::<Input<KeyCode>>()
-            .add_system(
-                input::keyboard_input_system
-                    .in_set(InputSystem)
-                    .in_base_set(CoreSet::PreUpdate),
+            .add_systems(
+                PreUpdate,
+                input::keyboard_input_system.in_set(InputSystem),
             )
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
             .init_resource::<Input<MouseButton>>()
             .init_resource::<input::MouseState>()
-            .add_system(
-                input::mouse_input_system
-                    .in_set(InputSystem)
-                    .in_base_set(CoreSet::PreUpdate),
+            .add_systems(
+                PreUpdate,
+                input::mouse_input_system.in_set(InputSystem),
             );
 
         // Register the common type
@@ -167,7 +166,7 @@ impl Plugin for TuiPlugin {
 /// # use bevy_tui::RawConsoleEvent;
 /// RawConsoleEvent(crossterm::event::Event::FocusGained);
 /// ```
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct RawConsoleEvent(pub crossterm::event::Event);
 
 /// Create and register a [`BevyTerminal`] inside the Bevy system for future use by a Terminal UI.

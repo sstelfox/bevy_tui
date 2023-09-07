@@ -1,20 +1,20 @@
 [package]
 name = "bevy_tui"
-version = "0.10.1"
+version = "0.11.1"
 edition = "2021"
 authors = ["Sam Stelfox"]
 description = "A plugin for making interactive Bevy applications with a TUI instead of a graphical interface."
 categories = ["command-line-interface", "command-line-utilities"]
-keywords = ["bevy", "cli", "console", "input", "terminal", "tui"]
+keywords = ["bevy", "cli", "console", "terminal", "tui"]
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/sstelfox/bevy_tui"
 documentation = "https://docs.rs/bevy_tui/"
 
 [dependencies]
-bevy = { default-features = false, version = "^0.10" }
-crossterm = "^0.26"
-tui = {package = "ratatui", version = "0.21"}
+bevy = { default-features = false, version = "^0.11" }
+crossterm = "^0.27"
+tui = {package = "ratatui", version = "0.23"}
 
 [lib]
 name = "bevy_tui"

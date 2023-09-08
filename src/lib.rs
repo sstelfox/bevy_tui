@@ -94,9 +94,9 @@ impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(TaskPoolPlugin::default())
-            .add(TypeRegistrationPlugin::default())
-            .add(TimePlugin::default())
-            .add(TuiPlugin::default())
+            .add(TypeRegistrationPlugin)
+            .add(TimePlugin)
+            .add(TuiPlugin)
     }
 }
 
@@ -115,7 +115,7 @@ impl PluginGroup for MinimalTuiPlugins {
 /// use bevy_tui::prelude::*;
 ///
 /// App::new()
-///     .add_plugins(TuiPlugin::default())
+///     .add_plugins(TuiPlugin)
 ///     .run();
 /// ```
 #[derive(Default)]

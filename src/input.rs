@@ -68,7 +68,7 @@ pub(crate) fn keyboard_input_system(
     let currently_pressed: Vec<KeyCode> = key_input.get_pressed().copied().collect();
     let mut pressed_events = vec![];
 
-    for event in &mut keyboard_input_events {
+    for event in keyboard_input_events.read() {
         match event.state {
             ButtonState::Pressed => {
                 pressed_events.push(event.key_code);
@@ -99,7 +99,7 @@ pub(crate) fn mouse_input_system(
 ) {
     mouse_input.clear();
 
-    for event in &mut mouse_input_events {
+    for event in mouse_input_events.read() {
         let new_location = match event {
             MouseInput::Button(_, _, loc) | MouseInput::Movement(loc) => loc,
         };

@@ -44,7 +44,7 @@ fn main() {
     let runner = commands::Runner::new(enabled_checks);
 
     match runner.execute() {
-        Ok(_) => {
+        Ok(()) => {
             println!("All checks passed successfully!");
             std::process::exit(0);
         }

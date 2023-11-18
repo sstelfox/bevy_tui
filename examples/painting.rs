@@ -5,12 +5,11 @@ use bevy::prelude::*;
 use bevy::app::AppExit;
 use bevy_tui::prelude::*;
 
-use tui::backend::Backend;
-use tui::layout::{Alignment, Constraint, Layout, Rect};
-use tui::style::Style;
-use tui::text::Span;
-use tui::widgets::{Paragraph, Wrap};
-use tui::Frame;
+use ratatui::layout::{Alignment, Rect};
+use ratatui::style::Style;
+use ratatui::text::Span;
+use ratatui::widgets::{Paragraph, Wrap};
+use ratatui::Frame;
 
 #[derive(Resource)]
 struct BoundedCamera {
@@ -79,9 +78,9 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: Backend>(f: &mut Frame<B>, camera: &BoundedCamera, canvas_data: &CanvasData) {
+fn render_ui(f: &mut Frame, camera: &BoundedCamera, _canvas_data: &CanvasData) {
     // Render canvas to the entirety of the screen
-    let canvas = f.size();
+    let _canvas = f.size();
 
     let camera_position_rect = Rect {
         x: 2,
@@ -90,11 +89,11 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, camera: &BoundedCamera, canvas_data: 
         height: 3,
     };
 
-    let camera_position_block = tui::widgets::Block::default()
+    let camera_position_block = ratatui::widgets::Block::default()
         .title(" Pos ")
-        .borders(tui::widgets::Borders::ALL)
-        .border_style(tui::style::Style::default().fg(tui::style::Color::White))
-        .border_type(tui::widgets::BorderType::Rounded);
+        .borders(ratatui::widgets::Borders::ALL)
+        .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::White))
+        .border_type(ratatui::widgets::BorderType::Rounded);
 
     let camera_position_text_rect = camera_position_block.inner(camera_position_rect);
     f.render_widget(camera_position_block, camera_position_rect);
@@ -117,11 +116,11 @@ fn render_ui<B: Backend>(f: &mut Frame<B>, camera: &BoundedCamera, canvas_data: 
         height: 11,
     };
 
-    let palette_block = tui::widgets::Block::default()
+    let palette_block = ratatui::widgets::Block::default()
         .title(" Palette ")
-        .borders(tui::widgets::Borders::ALL)
-        .border_style(tui::style::Style::default().fg(tui::style::Color::White))
-        .border_type(tui::widgets::BorderType::Rounded);
+        .borders(ratatui::widgets::Borders::ALL)
+        .border_style(ratatui::style::Style::default().fg(ratatui::style::Color::White))
+        .border_type(ratatui::widgets::BorderType::Rounded);
 
     f.render_widget(palette_block, palette_rect);
 }

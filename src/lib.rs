@@ -21,7 +21,7 @@
 //! }
 //! ```
 
-use bevy::app::{App, Startup, PreUpdate, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder, PreUpdate, Startup};
 use bevy::core::{TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
@@ -51,7 +51,7 @@ use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
 use crate::terminal_helpers::create_terminal;
 
 /// The Bevy resource that gets exposed to perform frame render operations. This is a thin wrapper
-/// around a [`tui::Terminal`] with no specific backend specified.
+/// around a [`ratatui::Terminal`] with no specific backend specified.
 ///
 /// # Examples
 ///
@@ -60,19 +60,19 @@ use crate::terminal_helpers::create_terminal;
 /// use bevy_tui::Terminal;
 ///
 /// let mut stdout = Vec::new();
-/// let mut crossterm_backend = tui::backend::CrosstermBackend::new(stdout);
-/// let tui_terminal = tui::Terminal::new(crossterm_backend)?;
+/// let mut crossterm_backend = ratatui::backend::CrosstermBackend::new(stdout);
+/// let tui_terminal = ratatui::Terminal::new(crossterm_backend)?;
 ///
 /// Terminal(tui_terminal);
 ///
 /// # Ok::<(), Box<dyn std::error::Error>>(())
 /// ```
 #[derive(Resource)]
-pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
+pub struct Terminal<T: ratatui::backend::Backend>(pub ratatui::Terminal<T>);
 
 /// A short-hand type for a crossterm backed TUI terminal connected to STDOUT. This will likely go
 /// away in a more finalized version.
-pub type BevyTerminal = Terminal<tui::backend::CrosstermBackend<std::io::Stdout>>;
+pub type BevyTerminal = Terminal<ratatui::backend::CrosstermBackend<std::io::Stdout>>;
 
 /// A helper plugin group that sets up the bare minimum plugins for use in a Bevy plugin project.
 /// This should be used in place of the Bevy `MinimalPlugins` plugin group as that includes a
@@ -125,22 +125,16 @@ impl Plugin for TuiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
-            .add_systems(Startup,terminal_setup)
+            .add_systems(Startup, terminal_setup)
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
             .init_resource::<Input<KeyCode>>()
-            .add_systems(
-                PreUpdate,
-                input::keyboard_input_system.in_set(InputSystem),
-            )
+            .add_systems(PreUpdate, input::keyboard_input_system.in_set(InputSystem))
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
             .init_resource::<Input<MouseButton>>()
             .init_resource::<input::MouseState>()
-            .add_systems(
-                PreUpdate,
-                input::mouse_input_system.in_set(InputSystem),
-            );
+            .add_systems(PreUpdate, input::mouse_input_system.in_set(InputSystem));
 
         // Register the common type
         app.register_type::<ButtonState>();

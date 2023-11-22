@@ -11,7 +11,6 @@ pub enum RunMode {
     //// Indicates that the [`App`]'s schedule should run only when it receives events from the
     //// terminal (such as resizes, keypresses, etc).
     //EventsOnly,
-
     /// Indicates that the [`App`]'s schedule should run repeatedly attempting to consistently run
     /// every `wait` interval. Updates will also occur when one or more terminal events are
     /// received.
@@ -22,7 +21,6 @@ pub enum RunMode {
         /// [`RunMode::LoopNoEvents`] should be chosen instead.
         wait: Duration,
     },
-
     //// Indicates that the [`App`]'s schedule should run repeatedly attempting to consistently run
     //// every `wait` interval. Terminal events will not trigger updates to the app.
     //LoopNoEvents {
@@ -111,7 +109,7 @@ impl Plugin for TuiScheduleRunnerPlugin {
             match settings.run_mode {
                 RunMode::Once => {
                     app.update();
-                },
+                }
                 //RunMode::EventsOnly => {
                 //    while let Ok(event) = read_term_event() {
                 //        process_event(&mut app, event);
@@ -124,33 +122,41 @@ impl Plugin for TuiScheduleRunnerPlugin {
                 //    }
                 //},
                 RunMode::Loop { wait } => {
-                    let mut tick = move |app: &mut App, wait: Duration| -> Result<Option<Duration>, AppExit> {
+                    let mut tick = move |app: &mut App,
+                                         wait: Duration|
+                          -> Result<Option<Duration>, AppExit> {
                         let start_time = Instant::now();
 
                         process_all_events(app);
 
-                        if let Some(app_exit_events) = app.world.get_resource_mut::<BevyEvents<AppExit>>() {
-                            if let Some(exit) = app_exit_event_reader.iter(&app_exit_events).last() {
+                        if let Some(app_exit_events) =
+                            app.world.get_resource_mut::<BevyEvents<AppExit>>()
+                        {
+                            if let Some(exit) = app_exit_event_reader.iter(&app_exit_events).last()
+                            {
                                 println!("found app exit event 1");
                                 return Err(exit.clone());
                             } else {
                                 println!("no app exit event 1");
                             }
                         } else {
-                                println!("no exit event reader 1");
+                            println!("no exit event reader 1");
                         }
 
                         app.update();
 
-                        if let Some(app_exit_events) = app.world.get_resource_mut::<BevyEvents<AppExit>>() {
-                            if let Some(exit) = app_exit_event_reader.iter(&app_exit_events).last() {
+                        if let Some(app_exit_events) =
+                            app.world.get_resource_mut::<BevyEvents<AppExit>>()
+                        {
+                            if let Some(exit) = app_exit_event_reader.iter(&app_exit_events).last()
+                            {
                                 println!("found app exit event 1");
                                 return Err(exit.clone());
                             } else {
                                 println!("no app exit event 1");
                             }
                         } else {
-                                println!("no exit event reader 1");
+                            println!("no exit event reader 1");
                         }
 
                         let end_time = Instant::now();
@@ -185,7 +191,7 @@ impl Plugin for TuiScheduleRunnerPlugin {
 
                     //    delay = wait - execution_time.expect("a time measurement if we intended to keep going");
                     //}
-                },
+                }
                 //RunMode::LoopNoEvents { wait } => {
                 //    loop {
                 //        process_all_events(&mut app);
@@ -208,16 +214,15 @@ impl Plugin for TuiScheduleRunnerPlugin {
 
 fn process_event(app: &mut App, event: TerminalEvent) {
     match event {
-        TerminalEvent::Key(key) => {
-            match key.code {
-                TerminalKeyCode::Char('q') => {
-                    println!("detected exit command");
-                    app.world.send_event(AppExit);
-                },
-                TerminalKeyCode::Esc => {
-                    crossterm::terminal::disable_raw_mode().expect("disabling raw mode");
+        TerminalEvent::Key(key) => match key.code {
+            TerminalKeyCode::Char('q') => {
+                println!("detected exit command");
+                app.world.send_event(AppExit);
+            }
+            TerminalKeyCode::Esc => {
+                crossterm::terminal::disable_raw_mode().expect("disabling raw mode");
 
-                    if let Some(mut terminal) = app.world.get_resource_mut::<BevyTerminal<tui::backend::CrosstermBackend<std::io::Stdout>>>() {
+                if let Some(mut terminal) = app.world.get_resource_mut::<BevyTerminal<ratatui::backend::CrosstermBackend<std::io::Stdout>>>() {
                         {
                             let term_stdout = terminal.0.backend_mut();
                             term_stdout.queue(crossterm::terminal::LeaveAlternateScreen).expect("returning to normal screen");
@@ -228,11 +233,10 @@ fn process_event(app: &mut App, event: TerminalEvent) {
                         terminal.0.show_cursor().expect("restoring cursor");
                     }
 
-                    std::process::exit(23);
-                },
-                _ => {
-                    println!("received unbound terminal key: {key:?}");
-                },
+                std::process::exit(23);
+            }
+            _ => {
+                println!("received unbound terminal key: {key:?}");
             }
         },
         _ => {

@@ -10,8 +10,9 @@ use bevy::ecs::system::{ResMut, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input};
-use bevy::reflect::{FromReflect, Reflect};
-use crossterm::event::Event;
+use bevy::prelude::Event as BevyEvent;
+use bevy::reflect::Reflect;
+use crossterm::event::Event as CrossEvent;
 
 mod converters;
 
@@ -23,7 +24,7 @@ use crate::RawConsoleEvent;
 /// The Bevy version of `KeyboardInput` requires a scan code which we can't receive from a terminal
 /// as the code have already been adapted through a keyboard layout long before we receive the
 /// event.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Reflect, FromReflect)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, BevyEvent, Reflect)]
 pub(crate) struct KeyboardInput {
     /// The key code of button pressed.
     key_code: KeyCode,
@@ -36,17 +37,20 @@ pub(crate) struct KeyboardInput {
 // This enum name triggers one of the pedantic clippy modules which I generally agree with, but in
 // this case we're matching the name of the similar data structure in Bevy proper.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, Copy, PartialEq, Reflect, FromReflect)]
+#[derive(Debug, Clone, Copy, PartialEq, BevyEvent, Reflect)]
 pub enum MouseInput {
     Button(MouseButton, ButtonState, [u16; 2]),
     Movement([u16; 2]),
 }
 
 /// TODO: write documentation
-#[derive(Debug, Default, FromReflect, Reflect, Resource)]
+#[derive(Debug, Default, Reflect, Resource)]
 pub struct MouseState {
     last_location: Option<[u16; 2]>,
 }
+#[derive(Debug, Clone, Copy, PartialEq, Reflect)]
+/// TODO: write documentation
+pub struct WindowResized;
 
 pub(crate) fn keyboard_input_system(
     mut key_input: ResMut<Input<KeyCode>>,
@@ -64,7 +68,7 @@ pub(crate) fn keyboard_input_system(
     let currently_pressed: Vec<KeyCode> = key_input.get_pressed().copied().collect();
     let mut pressed_events = vec![];
 
-    for event in keyboard_input_events.iter() {
+    for event in keyboard_input_events.read() {
         match event.state {
             ButtonState::Pressed => {
                 pressed_events.push(event.key_code);
@@ -95,7 +99,7 @@ pub(crate) fn mouse_input_system(
 ) {
     mouse_input.clear();
 
-    for event in mouse_input_events.iter() {
+    for event in mouse_input_events.read() {
         let new_location = match event {
             MouseInput::Button(_, _, loc) | MouseInput::Movement(loc) => loc,
         };
@@ -120,24 +124,24 @@ pub(crate) fn mouse_input_system(
     }
 }
 
-pub(crate) fn event_handler(app: &mut App, event: Event) {
+pub(crate) fn event_handler(app: &mut App, event: CrossEvent) {
     match event {
-        Event::FocusGained | Event::FocusLost => {
+        CrossEvent::FocusGained | CrossEvent::FocusLost => {
             // todo: handle marking us as focused/unfocused in our window equivalent
         }
-        Event::Key(event) => {
+        CrossEvent::Key(event) => {
             converters::convert_keyboard_input(event)
                 .into_iter()
                 .for_each(|ki| app.world.send_event(ki));
         }
-        Event::Mouse(event) => {
+        CrossEvent::Mouse(event) => {
             app.world.send_event(converters::convert_mouse_input(event));
         }
-        Event::Paste(ref _data) => {
+        CrossEvent::Paste(ref _data) => {
             // todo: publish event with the pasted content
             // todo: do I get style info?
         }
-        Event::Resize(_width, _height) => {
+        CrossEvent::Resize(_width, _height) => {
             // todo: update the size of our window equivalent
         }
     }

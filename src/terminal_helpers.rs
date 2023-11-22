@@ -9,7 +9,7 @@ use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
 };
 use crossterm::QueueableCommand;
-use tui::backend::CrosstermBackend;
+use ratatui::backend::CrosstermBackend;
 
 use crate::{BevyTerminal, Terminal};
 
@@ -20,12 +20,12 @@ use crate::{BevyTerminal, Terminal};
 /// # Errors
 ///
 /// The Terminal will fail to be created if STDOUT isn't available, or not a terminal. See
-/// [`tui::Terminal::new`] for details on the failure cases.
+/// [`ratatui::Terminal::new`] for details on the failure cases.
 pub(crate) fn create_terminal() -> Result<BevyTerminal, Box<dyn Error>> {
     let stdout = std::io::stdout();
 
     let backend = CrosstermBackend::new(stdout);
-    let terminal = tui::Terminal::new(backend)?;
+    let terminal = ratatui::Terminal::new(backend)?;
 
     Ok(Terminal(terminal))
 }
@@ -55,7 +55,7 @@ pub fn initialize_terminal() -> Result<(), Box<dyn Error>> {
     // TODO: Make this a setting for the application
     //stdout.queue(crossterm::terminal::SetTitle("Hello Bevy"))?;
 
-    stdout.flush().expect("terminal command trigger");
+    stdout.flush()?;
 
     Ok(())
 }

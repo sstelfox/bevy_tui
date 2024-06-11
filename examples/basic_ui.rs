@@ -5,12 +5,12 @@ use bevy::prelude::*;
 use bevy::app::AppExit;
 use bevy_tui::prelude::*;
 
-use tui::backend::Backend;
-use tui::layout::{Alignment, Constraint, Layout};
-use tui::style::Style;
-use tui::text::Span;
-use tui::widgets::{Paragraph, Wrap};
-use tui::Frame;
+use ratatui::layout::{Alignment, Constraint, Layout};
+use ratatui::prelude::Direction;
+use ratatui::style::Style;
+use ratatui::text::Span;
+use ratatui::widgets::{Paragraph, Wrap};
+use ratatui::Frame;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Perform the initial setup of the terminal such as enabling raw mode, switching to the
@@ -21,8 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // and input handling.
     App::new()
         .add_plugins(MinimalTuiPlugins)
-        .add_system(run_basic_ui)
-        .add_system(quit_on_esc)
+        .add_systems(Update, (run_basic_ui, quit_on_esc))
         .run();
 
     // The changes to the terminal need to be undone before returning the terminal for interactive
@@ -43,13 +42,14 @@ fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppE
     }
 }
 
-fn render_ui<B: Backend>(
-    f: &mut Frame<B>,
+fn render_ui(
+    f: &mut Frame,
     keyboard: &Input<KeyCode>,
     mouse: &Input<MouseButton>,
     mouse_state: &MouseState,
 ) {
     let chunks = Layout::default()
+        .direction(Direction::Vertical)
         .constraints(
             [
                 Constraint::Length(1),

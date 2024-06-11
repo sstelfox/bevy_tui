@@ -175,7 +175,7 @@ impl Runner {
     pub(crate) fn execute(&self) -> Result<(), Vec<CommandRunDetails>> {
         let mut failures = vec![];
 
-        for check_command in CI_COMMANDS.iter() {
+        for check_command in CI_COMMANDS {
             if self.checks.contains(check_command.check_type) {
                 println!(
                     "Running {:?}({})...",

@@ -7,7 +7,7 @@ use crate::input::{KeyboardInput, MouseInput};
 
 macro_rules! shifted {
     ($key_code:expr) => {
-        vec![KeyCode::LShift, $key_code]
+        vec![KeyCode::ShiftLeft, $key_code]
     };
 }
 
@@ -81,10 +81,10 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
         'O' => shifted!(KeyCode::O),
         'p' => unshifted!(KeyCode::P),
         'P' => shifted!(KeyCode::P),
-        '[' => unshifted!(KeyCode::LBracket),
-        '{' => shifted!(KeyCode::LBracket),
-        ']' => unshifted!(KeyCode::RBracket),
-        '}' => shifted!(KeyCode::RBracket),
+        '[' => unshifted!(KeyCode::BracketLeft),
+        '{' => shifted!(KeyCode::BracketLeft),
+        ']' => unshifted!(KeyCode::BracketRight),
+        '}' => shifted!(KeyCode::BracketRight),
         '\\' => unshifted!(KeyCode::Backslash),
         '|' => shifted!(KeyCode::Backslash),
         'a' => unshifted!(KeyCode::A),
@@ -132,7 +132,7 @@ fn character_key_code(chr: char) -> Vec<KeyCode> {
         // todo: all the typeable keyboard characters...
         _ => {
             println!(
-                "unknown typable keyboard character: '{chr}' ({})",
+                "unknown typeable keyboard character: '{chr}' ({})",
                 chr as u32
             );
             vec![]
@@ -174,6 +174,9 @@ pub(super) fn convert_mouse_input(mouse_input: crossterm::event::MouseEvent) -> 
         MouseEventKind::ScrollDown | MouseEventKind::ScrollUp => {
             unimplemented!("{mouse_input:?}\r");
         }
+        MouseEventKind::ScrollLeft |
+        MouseEventKind::ScrollRight => {
+            unimplemented!("{mouse_input:?}\r");}
     }
 }
 

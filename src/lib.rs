@@ -21,13 +21,13 @@
 //! }
 //! ```
 
-use bevy::app::{App, CoreStage, Plugin, PluginGroup, PluginGroupBuilder};
-use bevy::core::CorePlugin;
+use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder, PreUpdate, Startup};
+use bevy::core::{TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
 use bevy::input::{ButtonState, Input, InputSystem};
-use bevy::prelude::IntoSystemDescriptor;
+use bevy::prelude::{Event, IntoSystemConfigs};
 use bevy::time::TimePlugin;
 
 mod input;
@@ -41,7 +41,7 @@ mod terminal_helpers;
 /// use bevy_tui::prelude::*;
 /// ```
 pub mod prelude {
-    pub use crate::input::MouseState;
+    pub use crate::input::{MouseState, WindowResized};
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
     pub use crate::{MinimalTuiPlugins, TuiPlugin};
 }
@@ -51,7 +51,7 @@ use crate::scheduler::{tui_schedule_runner, TuiPersistentState};
 use crate::terminal_helpers::create_terminal;
 
 /// The Bevy resource that gets exposed to perform frame render operations. This is a thin wrapper
-/// around a [`tui::Terminal`] with no specific backend specified.
+/// around a [`ratatui::Terminal`] with no specific backend specified.
 ///
 /// # Examples
 ///
@@ -60,19 +60,19 @@ use crate::terminal_helpers::create_terminal;
 /// use bevy_tui::Terminal;
 ///
 /// let mut stdout = Vec::new();
-/// let mut crossterm_backend = tui::backend::CrosstermBackend::new(stdout);
-/// let tui_terminal = tui::Terminal::new(crossterm_backend)?;
+/// let mut crossterm_backend = ratatui::backend::CrosstermBackend::new(stdout);
+/// let tui_terminal = ratatui::Terminal::new(crossterm_backend)?;
 ///
 /// Terminal(tui_terminal);
 ///
 /// # Ok::<(), Box<dyn std::error::Error>>(())
 /// ```
 #[derive(Resource)]
-pub struct Terminal<T: tui::backend::Backend>(pub tui::Terminal<T>);
+pub struct Terminal<T: ratatui::backend::Backend>(pub ratatui::Terminal<T>);
 
 /// A short-hand type for a crossterm backed TUI terminal connected to STDOUT. This will likely go
 /// away in a more finalized version.
-pub type BevyTerminal = Terminal<tui::backend::CrosstermBackend<std::io::Stdout>>;
+pub type BevyTerminal = Terminal<ratatui::backend::CrosstermBackend<std::io::Stdout>>;
 
 /// A helper plugin group that sets up the bare minimum plugins for use in a Bevy plugin project.
 /// This should be used in place of the Bevy `MinimalPlugins` plugin group as that includes a
@@ -93,9 +93,10 @@ pub struct MinimalTuiPlugins;
 impl PluginGroup for MinimalTuiPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
-            .add(CorePlugin::default())
-            .add(TimePlugin::default())
-            .add(TuiPlugin::default())
+            .add(TaskPoolPlugin::default())
+            .add(TypeRegistrationPlugin)
+            .add(TimePlugin)
+            .add(TuiPlugin)
     }
 }
 
@@ -114,7 +115,7 @@ impl PluginGroup for MinimalTuiPlugins {
 /// use bevy_tui::prelude::*;
 ///
 /// App::new()
-///     .add_plugin(TuiPlugin::default())
+///     .add_plugins(TuiPlugin)
 ///     .run();
 /// ```
 #[derive(Default)]
@@ -124,22 +125,16 @@ impl Plugin for TuiPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(TuiPersistentState::default())
             .set_runner(tui_schedule_runner)
-            .add_startup_system(terminal_setup)
+            .add_systems(Startup, terminal_setup)
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
             .init_resource::<Input<KeyCode>>()
-            .add_system_to_stage(
-                CoreStage::PreUpdate,
-                input::keyboard_input_system.label(InputSystem),
-            )
+            .add_systems(PreUpdate, input::keyboard_input_system.in_set(InputSystem))
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
             .init_resource::<Input<MouseButton>>()
             .init_resource::<input::MouseState>()
-            .add_system_to_stage(
-                CoreStage::PreUpdate,
-                input::mouse_input_system.label(InputSystem),
-            );
+            .add_systems(PreUpdate, input::mouse_input_system.in_set(InputSystem));
 
         // Register the common type
         app.register_type::<ButtonState>();
@@ -165,7 +160,7 @@ impl Plugin for TuiPlugin {
 /// # use bevy_tui::RawConsoleEvent;
 /// RawConsoleEvent(crossterm::event::Event::FocusGained);
 /// ```
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct RawConsoleEvent(pub crossterm::event::Event);
 
 /// Create and register a [`BevyTerminal`] inside the Bevy system for future use by a Terminal UI.

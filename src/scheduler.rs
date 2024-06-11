@@ -71,7 +71,7 @@ fn tick(
         .mark_completed_tick();
 
     if let Some(app_exit_events) = app.world.get_resource::<Events<AppExit>>() {
-        if app_exit_event_reader.iter(app_exit_events).last().is_some() {
+        if app_exit_event_reader.read(app_exit_events).last().is_some() {
             return Ok(None);
         }
     }

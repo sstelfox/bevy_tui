@@ -1,25 +1,5 @@
 #![feature(rustdoc_missing_doc_code_examples)]
-
-//! A plugin for making interactive Bevy applications with a TUI instead of a graphical interface.
-//!
-//! # Examples
-//!
-//! ```no_run
-//! use bevy::prelude::*;
-//! use bevy_tui::prelude::*;
-//!
-//! fn main() -> Result<(), Box<dyn std::error::Error>> {
-//!     initialize_terminal()?;
-//!
-//!     App::new()
-//!         .add_plugins(MinimalTuiPlugins)
-//!         .run();
-//!
-//!     teardown_terminal()?;
-//!
-//!     Ok(())
-//! }
-//! ```
+#![doc = include_str!("../README.md")]
 
 use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder, PreUpdate, Startup};
 use bevy::core::{TaskPoolPlugin, TypeRegistrationPlugin};

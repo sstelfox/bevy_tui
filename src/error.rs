@@ -1,7 +1,7 @@
 use std::error::Error as StdError;
 use std::fmt::{self, Display, Formatter};
 
-/// This is the core error type inside the crate.
+/// A top-level catch all error type for the crate.
 #[derive(Debug)]
 pub enum Error {
     /// This is an extreme and odd error to encounter. If this occurs the Bevy system did not have

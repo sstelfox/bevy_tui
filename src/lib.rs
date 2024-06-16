@@ -26,7 +26,7 @@ use bevy::core::{TaskPoolPlugin, TypeRegistrationPlugin};
 use bevy::ecs::system::{Commands, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
-use bevy::input::{ButtonState, Input, InputSystem};
+use bevy::input::{ButtonInput, ButtonState, InputSystem};
 use bevy::prelude::{Event, IntoSystemConfigs};
 use bevy::time::TimePlugin;
 
@@ -128,11 +128,11 @@ impl Plugin for TuiPlugin {
             .add_systems(Startup, terminal_setup)
             .add_event::<KeyboardInput>()
             .add_event::<RawConsoleEvent>()
-            .init_resource::<Input<KeyCode>>()
+            .init_resource::<ButtonInput<KeyCode>>()
             .add_systems(PreUpdate, input::keyboard_input_system.in_set(InputSystem))
             .add_event::<MouseInput>()
             .add_event::<MouseMotion>()
-            .init_resource::<Input<MouseButton>>()
+            .init_resource::<ButtonInput<MouseButton>>()
             .init_resource::<input::MouseState>()
             .add_systems(PreUpdate, input::mouse_input_system.in_set(InputSystem));
 

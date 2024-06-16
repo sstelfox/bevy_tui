@@ -9,7 +9,7 @@ use bevy::ecs::event::{EventReader, EventWriter};
 use bevy::ecs::system::{ResMut, Resource};
 use bevy::input::keyboard::KeyCode;
 use bevy::input::mouse::{MouseButton, MouseMotion};
-use bevy::input::{ButtonState, Input};
+use bevy::input::{ButtonInput, ButtonState};
 use bevy::prelude::Event as BevyEvent;
 use bevy::reflect::Reflect;
 use crossterm::event::Event as CrossEvent;
@@ -53,7 +53,7 @@ pub struct MouseState {
 pub struct WindowResized;
 
 pub(crate) fn keyboard_input_system(
-    mut key_input: ResMut<Input<KeyCode>>,
+    mut key_input: ResMut<ButtonInput<KeyCode>>,
     mut keyboard_input_events: EventReader<KeyboardInput>,
 ) {
     // We don't get key release events from the terminal. There is an enhancement in the kitty
@@ -92,7 +92,7 @@ pub(crate) fn keyboard_input_system(
 }
 
 pub(crate) fn mouse_input_system(
-    mut mouse_input: ResMut<Input<MouseButton>>,
+    mut mouse_input: ResMut<ButtonInput<MouseButton>>,
     mut mouse_state: ResMut<MouseState>,
     mut mouse_input_events: EventReader<MouseInput>,
     mut mouse_motion_event_writer: EventWriter<MouseMotion>,
@@ -130,9 +130,9 @@ pub(crate) fn event_handler(app: &mut App, event: CrossEvent) {
             // todo: handle marking us as focused/unfocused in our window equivalent
         }
         CrossEvent::Key(event) => {
-            converters::convert_keyboard_input(event)
-                .into_iter()
-                .for_each(|ki| app.world.send_event(ki));
+            for ki in converters::convert_keyboard_input(event) {
+                app.world.send_event(ki);
+            }
         }
         CrossEvent::Mouse(event) => {
             app.world.send_event(converters::convert_mouse_input(event));

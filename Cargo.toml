@@ -1,27 +1,28 @@
 [package]
-authors = ["Sam Stelfox"]
-categories = ["command-line-interface", "command-line-utilities"]
-description = "A plugin for making interactive Bevy applications with a TUI instead of a graphical interface."
-documentation = "https://docs.rs/bevy_tui/"
-edition = "2021"
-keywords = ["bevy", "cli", "console", "terminal", "tui"]
-license = "MIT"
 name = "bevy_tui"
-readme = "README.md"
-repository = "https://github.com/sstelfox/bevy_tui"
+description = "A plugin for making interactive Bevy applications with a TUI instead of a graphical interface."
 version = "0.11.2"
 
+categories = ["command-line-interface", "command-line-utilities"]
+keywords = ["bevy", "cli", "console", "terminal", "tui"]
+
+authors = ["Sam Stelfox <sstelfox@bedroomprogrammers.net>"]
+documentation = "https://docs.rs/bevy_tui/"
+repository = "https://github.com/sstelfox/bevy_tui"
+
+edition = "2021"
+license = "MIT"
+readme = "README.md"
+
 [dependencies]
-bevy = {default-features = false, version = "^0.12"}
+bevy = { default-features = false, version = "^0.13" }
 crossterm = "^0.27"
-ratatui = "^0.24"
+ratatui = "^0.26"
 
 [lib]
 name = "bevy_tui"
 path = "src/lib.rs"
 
 [workspace]
-members = [
-  "tools/*",
-]
+members = ["tools/*"]
 resolver = "2"

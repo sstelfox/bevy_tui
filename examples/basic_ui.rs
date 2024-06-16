@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // and input handling.
     App::new()
         .add_plugins(MinimalTuiPlugins)
-        .add_systems(Update, (run_basic_ui, quit_on_esc))
+        .add_systems(Update, (run_basic_ui, quit_system))
         .run();
 
     // The changes to the terminal need to be undone before returning the terminal for interactive
@@ -36,16 +36,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 // `Res<_>` type to be passed by value so we unfortunately have to disable this lint wherever a
 // `Res<_>` is used but not consumed.
 #[allow(clippy::needless_pass_by_value)]
-fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
-    if key_code.just_pressed(KeyCode::Q) {
+fn quit_system(key_code: Res<ButtonInput<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
+    if key_code.just_pressed(KeyCode::KeyQ) {
         event_writer.send(AppExit);
     }
 }
 
 fn render_ui(
     f: &mut Frame,
-    keyboard: &Input<KeyCode>,
-    mouse: &Input<MouseButton>,
+    keyboard: &ButtonInput<KeyCode>,
+    mouse: &ButtonInput<MouseButton>,
     mouse_state: &MouseState,
 ) {
     let chunks = Layout::default()
@@ -98,8 +98,8 @@ fn render_ui(
 #[allow(clippy::needless_pass_by_value)]
 fn run_basic_ui(
     mut terminal: ResMut<bevy_tui::BevyTerminal>,
-    keyboard: Res<Input<KeyCode>>,
-    mouse: Res<Input<MouseButton>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mouse: Res<ButtonInput<MouseButton>>,
     mouse_state: Res<MouseState>,
 ) {
     terminal

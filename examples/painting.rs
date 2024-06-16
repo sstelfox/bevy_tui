@@ -22,6 +22,7 @@ impl Default for BoundedCamera {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Resource)]
 struct CanvasData([u8; 256 * 256]);
 
@@ -38,7 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_plugins(MinimalTuiPlugins)
         .init_resource::<BoundedCamera>()
         .init_resource::<CanvasData>()
-        .add_systems(Update, (camera_controller, run_canvas_ui, quit_on_esc))
+        .add_systems(Update, (camera_controller, run_canvas_ui, quit_system))
         .run();
 
     teardown_terminal()?;
@@ -49,31 +50,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 // The resource can not be passed by value as we need this signature for Bevy to recognize it as a
 // system.
 #[allow(clippy::needless_pass_by_value)]
-fn camera_controller(key_code: Res<Input<KeyCode>>, mut camera: ResMut<BoundedCamera>) {
+fn camera_controller(key_code: Res<ButtonInput<KeyCode>>, mut camera: ResMut<BoundedCamera>) {
     // Up
-    if key_code.pressed(KeyCode::K) {
+    if key_code.pressed(KeyCode::KeyK) {
         camera.position[1] = camera.position[1].saturating_sub(1);
     }
 
     // Down
-    if key_code.pressed(KeyCode::J) {
+    if key_code.pressed(KeyCode::KeyJ) {
         camera.position[1] = camera.position[1].saturating_add(1);
     }
 
     // Right
-    if key_code.pressed(KeyCode::L) {
+    if key_code.pressed(KeyCode::KeyL) {
         camera.position[0] = camera.position[0].saturating_add(1);
     }
 
     // Left
-    if key_code.pressed(KeyCode::H) {
+    if key_code.pressed(KeyCode::KeyH) {
         camera.position[0] = camera.position[0].saturating_sub(1);
     }
 }
 
 #[allow(clippy::needless_pass_by_value)]
-fn quit_on_esc(key_code: Res<Input<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
-    if key_code.just_pressed(KeyCode::Q) {
+fn quit_system(key_code: Res<ButtonInput<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
+    if key_code.just_pressed(KeyCode::KeyQ) {
         event_writer.send(AppExit);
     }
 }

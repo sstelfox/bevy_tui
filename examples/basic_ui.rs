@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[allow(clippy::needless_pass_by_value)]
 fn quit_system(key_code: Res<ButtonInput<KeyCode>>, mut event_writer: EventWriter<AppExit>) {
     if key_code.just_pressed(KeyCode::KeyQ) {
-        event_writer.send(AppExit);
+        event_writer.send(AppExit::Success);
     }
 }
 

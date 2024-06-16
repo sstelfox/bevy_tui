@@ -131,11 +131,12 @@ pub(crate) fn event_handler(app: &mut App, event: CrossEvent) {
         }
         CrossEvent::Key(event) => {
             for ki in converters::convert_keyboard_input(event) {
-                app.world.send_event(ki);
+                app.world_mut().send_event(ki);
             }
         }
         CrossEvent::Mouse(event) => {
-            app.world.send_event(converters::convert_mouse_input(event));
+            app.world_mut()
+                .send_event(converters::convert_mouse_input(event));
         }
         CrossEvent::Paste(ref _data) => {
             // todo: publish event with the pasted content
@@ -146,5 +147,5 @@ pub(crate) fn event_handler(app: &mut App, event: CrossEvent) {
         }
     }
 
-    app.world.send_event(RawConsoleEvent(event));
+    app.world_mut().send_event(RawConsoleEvent(event));
 }

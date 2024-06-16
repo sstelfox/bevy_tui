@@ -30,9 +30,12 @@ use bevy::input::{ButtonInput, ButtonState, InputSystem};
 use bevy::prelude::{Event, IntoSystemConfigs};
 use bevy::time::TimePlugin;
 
+mod error;
 mod input;
 mod scheduler;
 mod terminal_helpers;
+
+pub use error::Error as BevyTuiError;
 
 /// A quick helper module to allow including all the commonly used and exposed public portions of
 /// this library. It can be used in your project like so:
@@ -43,7 +46,7 @@ mod terminal_helpers;
 pub mod prelude {
     pub use crate::input::{MouseState, WindowResized};
     pub use crate::terminal_helpers::{initialize_terminal, teardown_terminal};
-    pub use crate::{MinimalTuiPlugins, TuiPlugin};
+    pub use crate::{BevyTuiError, MinimalTuiPlugins, TuiPlugin};
 }
 
 use crate::input::{KeyboardInput, MouseInput};

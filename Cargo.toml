@@ -1,7 +1,7 @@
 [package]
 name = "bevy_tui"
 description = "A plugin for making interactive Bevy applications with a TUI instead of a graphical interface."
-version = "0.11.2"
+version = "0.13.0"
 
 categories = ["command-line-interface", "command-line-utilities"]
 keywords = ["bevy", "cli", "console", "terminal", "tui"]

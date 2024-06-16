@@ -7,15 +7,7 @@
 # scans on the content of the code as well to provide additional detections on
 # whether a vulnerability is present. The two tools should be used together.
 
-# Collect metadata using all the features available in this repository. We do
-# not want security vulnerabilities in any of our subset of builds.
-all-features = true
-
 [advisories]
-vulnerability = "deny"
-unmaintained = "deny"
-yanked = "deny"
-notice = "deny"
 
 # If we accept an advisory either because no fix is available and we need to
 # continue development, or because a vulnerability doesn't effect how we use
@@ -23,40 +15,17 @@ notice = "deny"
 # periodically reviewed and cleaned out as fixes become available.
 ignore = []
 
-[licenses]
-unlicensed = "deny"
+[graph]
+# Collect metadata using all the features available in this repository. We do
+# not want security vulnerabilities in any of our subset of builds.
+all-features = true
 
+[licenses]
 # Licenses we always allow without any additional thoughts, this list should
 # only be updated when we encounter a dependency using a license we want to
 # include here rather than trying to proactively enumerate all acceptable
 # licenses.
-allow = [
-  "Apache-2.0",
-  "0BSD",
-  "BSD-2-Clause",
-  "BSD-3-Clause",
-  "CC0-1.0",
-  "ISC",
-  "MIT",
-  "MIT-0",
-  "Unicode-DFS-2016",
-  "Zlib",
-]
-
-# We don't care what these organization think of the license, we are making our
-# own assessments as to whether they are fit for our project.
-allow-osi-fsf-free = "neither"
-
-# Licenses that we have reviewed and chosen to explicitly reject.
-deny = []
-
-# If a license is considered copyleft, we want to consider them carefully as
-# they may violate our license or goals by their use. Copy left licenses should
-# be reviewed and selectively added by the lead maintainer only.
-copyleft = "deny"
-
-# If we haven't approved it, explicitly deny it
-default = "deny"
+allow = ["Apache-2.0", "BSD-2-Clause", "MIT", "Unicode-DFS-2016", "Zlib"]
 
 # If we need to use a crate that violates our general policy, we can add that
 # to the list here to accept it.
@@ -79,8 +48,7 @@ deny = [
 # Certain crates/versions that will be skipped when doing duplicate detection.
 # They just couldn't be resolved ourselves.
 skip = [
-  { name = "concurrent-queue", version = "1.2.4" },   # async-channel v1.7.1
-  { name = "concurrent-queue", version = "2.0.0" },   # async-executor v1.5.0
+  { name = "concurrent-queue", version = "2.0.0" }, # async-executor v1.5.0
 ]
 
 [sources]

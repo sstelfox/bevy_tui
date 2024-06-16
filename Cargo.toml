@@ -15,7 +15,7 @@ license = "MIT"
 readme = "README.md"
 
 [dependencies]
-bevy = { default-features = false, version = "^0.13" }
+bevy = { default-features = false, git = "https://github.com/bevyengine/bevy.git", tag = "v0.14.0-rc.2" }
 crossterm = "^0.27"
 ratatui = "^0.26"
 

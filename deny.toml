@@ -35,20 +35,20 @@ exceptions = []
 multiple-versions = "deny"
 wildcards = "deny"
 
-# Crates/versions that are always allowed regardless of which checks they trigger
-allow = [
-  #{ name = "ansi_term", version = "=0.11.0" },
-]
-
-# Crates and versions that are explicitly denied from use in this project
-deny = [
-  #{ name = "ansi_term", version = "=0.11.0" },
-]
-
 # Certain crates/versions that will be skipped when doing duplicate detection.
 # They just couldn't be resolved ourselves.
 skip = [
-  { name = "concurrent-queue", version = "2.0.0" }, # async-executor v1.5.0
+  { name = "regex-automata", version = "=0.1.10" },
+  { name = "regex-syntax", version = "=0.6.29" },
+  { name = "tracing-log", version = "=0.1.4" },
+  { name = "windows-targets", version = "=0.48.5" },
+  { name = "windows_aarch64_gnullvm", version = "=0.48.5" },
+  { name = "windows_aarch64_msvc", version = "=0.48.5" },
+  { name = "windows_i686_gnu", version = "=0.48.5" },
+  { name = "windows_i686_msvc", version = "=0.48.5" },
+  { name = "windows_x86_64_gnu", version = "=0.48.5" },
+  { name = "windows_x86_64_msvc", version = "=0.48.5" },
+  { name = "windows_x86_64_gnullvm", version = "=0.48.5" },
 ]
 
 [sources]
